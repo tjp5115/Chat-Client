@@ -9,6 +9,8 @@
  */
 
 import java.io.IOException;
+import java.net.*;
+import javax.net.ssl.*;
 
 /* class Description
 
@@ -18,6 +20,35 @@ import java.io.IOException;
 */
 
 public class ToClient implements ServerListener{
+
+	private SSLSocket sok;
+
+	/*this method returns the ssl socket of the toclient
+	@post: sslsocket- the connection
+	*/
+	public SSLSocket getSok(){
+		return sok;
+	}//end
+
+    /*this method returns the IP of the computer connected on the other side(client)
+    @post: String rep of IP ex: "192.168.254.254"
+
+    */
+    public String getIP(){
+		return "NEEDS TO BE DONE";
+	}//end
+
+	/*overrides equals
+	@override
+
+	*/
+	public boolean equals(final Object obj) {
+		ToClient t = (ToClient)obj;
+		return sok.equals(t.getSok());
+
+	}//end
+
+
     /**
      * request for a friend from a given user.
      * @param usr1 - requestee
@@ -31,7 +62,7 @@ public class ToClient implements ServerListener{
 
     /**
      * return the IP of a user
-     * @param user - user to get the IP of
+     * @param user - user name of the IP
      * @param IP - IP address of the user.
      * @throws IOException
      */
@@ -57,6 +88,28 @@ public class ToClient implements ServerListener{
      * @throws IOException
      */
     public void friendRequestResponse(String user, int status) throws IOException{
+
+	}//end
+
+
+
+    /**
+     * initiate a conversation between two clients
+     * @param from - initiator
+     * @param to - responder
+     * @throws IOException
+     */
+    public void initConversation(String from, String to) throws IOException{
+
+	}
+
+
+    /*responce from server on either or not username was taken
+    1 - you now have the username
+    0 - that username is already taken
+
+    */
+    public void createAccountResponce(String user, int i){
 
 	}//end
 }//end class

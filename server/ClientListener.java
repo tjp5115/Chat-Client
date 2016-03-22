@@ -37,10 +37,11 @@ public interface ClientListener {
 
     /**
      * creates an account for a user
+     * @parm: String - the ip of this user
      * @param username
      * @throws IOException
      */
-    public void createAccount(String username) throws IOException;
+    public void createAccount(String ip, String username) throws IOException;
 
     /**
      * initiates a connection between two nodes

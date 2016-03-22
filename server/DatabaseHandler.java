@@ -43,8 +43,24 @@ public class DatabaseHandler implements ClientListener{
 			System.out.println("error creating the conn for database");
 			e.printStackTrace();
 		}//end catch
-
+		init();
 	}//end constructor
+
+
+	/*this method creates the tables in the database
+
+	*/
+	private void init(){
+		try{
+			Statement stmt = conn.createStatement();
+			stmt.execute("CREATE TABLE users(USER VARCHAR(255) PRIMARY KEY, IP VARCHAR(25), ONLINE BOOLEAN);");
+			stmt.execute("CREATE TABLE messages(MESSAGE VARCHAR(255), FOREIGN KEY(USER) REFERENCES USERS);");
+		}//end try
+		catch(SQLException e){
+			System.out.println("error creating tables");
+			e.printStackTrace();
+		}//end catch
+	}//end init
 
 	/*this method adds a connection
 
@@ -68,22 +84,47 @@ public class DatabaseHandler implements ClientListener{
 		ToClient t = cons.get(to);
 		//client isn't online
 		if(t == null){
-
+			try{
+				Statement stmt = conn.createStatement();
+				stmt.execute("INSERT INTO messages VALUES(\"" + from + " " + to + " " + status + "\"," + to+";");
+			}//end try
+			catch(SQLException e){
+				System.out.println("error inserting into messages");
+				e.printStackTrace();
+			}//end catch
 		}//end if
 
 		//if client is online
 		else{
-
+			t.userFriendStatus(from, to, status);
 		}//end
 	}//end friend
 
     /**
      * creates an account for a user
+     * @parm: String - the ip of this user
      * @param username
      * @throws IOException
      */
-    public void createAccount(String username) throws IOException{
-
+    public void createAccount(String ip, String username) throws IOException{
+		ToClient t = cons.get(ip);
+		ToClient n = cons.get(username);
+		if(username == null){
+			try{
+				Statement stmt = conn.createStatement();
+				stmt.execute("INSERT INTO users VALUES(\"" + username + "\",\"" + ip + "\",TRUE;");
+			}//end try
+			catch(SQLException e){
+				System.out.println("error inserting into messages");
+				e.printStackTrace();
+			}//end catch
+			cons.remove(ip);
+			cons.put(username,t);
+			t.createAccountResponce(username,1);
+		}//end if
+		else{
+			t.createAccountResponce(username,0);
+		}//end else
 	}//end create
 
     /**
@@ -91,7 +132,7 @@ public class DatabaseHandler implements ClientListener{
      * @throws IOException
      */
     public void initConnection() throws IOException{
-
+		//does nothing
 	}//end init
 
     /**
@@ -100,7 +141,17 @@ public class DatabaseHandler implements ClientListener{
      * @throws IOException
      */
     public void logon(String user) throws IOException{
-
+		ToClient t = cons.get(user);
+		try{
+			Statement stmt = conn.createStatement();
+			stmt.execute("UPDATE users " +
+				"SET IP=" + t.getIP() +", ONLINE=TRUE"
+				+ " WHERE USER=" + user + ";");
+		}//end try
+		catch(SQLException e){
+			System.out.println("error inserting into messages");
+			e.printStackTrace();
+		}//end catch
 	}//endlogon
 
     /**
@@ -109,7 +160,16 @@ public class DatabaseHandler implements ClientListener{
      * @throws IOException
      */
     public void logoff(String user) throws IOException{
-
+		try{
+			Statement stmt = conn.createStatement();
+			stmt.execute("UPDATE users " +
+				"SET IP=\"0.0.0.0\", ONLINE=FALSE"
+				+ " WHERE USER=" + user + ";");
+		}//end try
+		catch(SQLException e){
+			System.out.println("error inserting into messages");
+			e.printStackTrace();
+		}//end catch
 	}//end logoff
 
     /**
@@ -119,6 +179,14 @@ public class DatabaseHandler implements ClientListener{
      * @throws IOException
      */
     public void initConversation(String from, String to) throws IOException{
+		ToClient t = cons.get(to);
+		if(t == null){
+			ToClient n = cons.get(from);
+			n.error(to + " is not online");
+		}//end if
+		else{
+			t.initConversation(from,to);
+		}//end
 
 	}//end init
 
@@ -129,6 +197,21 @@ public class DatabaseHandler implements ClientListener{
      * @throws IOException
      */
     public void getIP(String from, String to) throws IOException{
-
+		ToClient t = cons.get(to);
+		if(t != null){
+			try{
+				Statement stmt = conn.createStatement();
+				ResultSet s = stmt.executeQuery("SELECT IP FROM USERS WHERE USER=" + to + ";");
+				t.IP(to,s.getString(1));
+			}//end try
+			catch(SQLException e){
+				System.out.println("error inserting into messages");
+				e.printStackTrace();
+			}//end catch
+		}//end if
+		else{
+			ToClient n = cons.get(from);
+			n.error(to + " is not online");
+		}
 	}//end getIP
 }//end class

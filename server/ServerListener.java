@@ -33,7 +33,7 @@ public interface ServerListener {
 
     /**
      * return the IP of a user
-     * @param user - user to get the IP of
+     * @param user - user to the IP
      * @param IP - IP address of the user.
      * @throws IOException
      */
@@ -55,4 +55,21 @@ public interface ServerListener {
      * @throws IOException
      */
     public void friendRequestResponse(String user, int status) throws IOException;
+
+
+
+    /**
+     * initiate a conversation between two clients
+     * @param from - initiator
+     * @param to - responder
+     * @throws IOException
+     */
+    public void initConversation(String from, String to) throws IOException;
+
+    /*responce from server on either or not username was taken
+    1 - you now have the username
+    0 - that username is already taken
+
+    */
+    public void createAccountResponce(String user, int i);
 }
