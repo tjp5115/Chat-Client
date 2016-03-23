@@ -65,7 +65,7 @@ public class DatabaseHandler implements ClientListener{
 	/*this method adds a connection
 
 	*/
-	public void add(String name, ToClient c){
+	public synchronized void add(String name, ToClient c){
 		cons.put(name,c);
 	}//end add
 
@@ -80,7 +80,7 @@ public class DatabaseHandler implements ClientListener{
      *              2 - reject
      * @throws IOException
      */
-    public void friendRequest( String from, String to, int status) throws IOException{
+    public synchronized void friendRequest( String from, String to, int status) throws IOException{
 		ToClient t = cons.get(to);
 		//client isn't online
 		if(t == null){
@@ -106,7 +106,7 @@ public class DatabaseHandler implements ClientListener{
      * @param username
      * @throws IOException
      */
-    public void createAccount(String ip, String username) throws IOException{
+    public synchronized void createAccount(String ip, String username) throws IOException{
 		ToClient t = cons.get(ip);
 		ToClient n = cons.get(username);
 		if(username == null){
@@ -131,7 +131,7 @@ public class DatabaseHandler implements ClientListener{
      * initiates a connection between two nodes
      * @throws IOException
      */
-    public void initConnection() throws IOException{
+    public synchronized void initConnection() throws IOException{
 		//does nothing
 	}//end init
 
@@ -140,7 +140,7 @@ public class DatabaseHandler implements ClientListener{
      * @param user - user to log on
      * @throws IOException
      */
-    public void logon(String user) throws IOException{
+    public synchronized void logon(String user) throws IOException{
 		ToClient t = cons.get(user);
 		try{
 			Statement stmt = conn.createStatement();
@@ -159,7 +159,7 @@ public class DatabaseHandler implements ClientListener{
      * @param user - user to log off
      * @throws IOException
      */
-    public void logoff(String user) throws IOException{
+    public synchronized void logoff(String user) throws IOException{
 		try{
 			Statement stmt = conn.createStatement();
 			stmt.execute("UPDATE users " +
@@ -178,7 +178,7 @@ public class DatabaseHandler implements ClientListener{
      * @param to - responder
      * @throws IOException
      */
-    public void initConversation(String from, String to) throws IOException{
+    public synchronized void initConversation(String from, String to) throws IOException{
 		ToClient t = cons.get(to);
 		if(t == null){
 			ToClient n = cons.get(from);
@@ -196,7 +196,7 @@ public class DatabaseHandler implements ClientListener{
      * @param to - what user to get the IP from
      * @throws IOException
      */
-    public void getIP(String from, String to) throws IOException{
+    public synchronized void getIP(String from, String to) throws IOException{
 		ToClient t = cons.get(to);
 		if(t != null){
 			try{
