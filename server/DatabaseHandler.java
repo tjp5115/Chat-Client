@@ -120,10 +120,10 @@ public class DatabaseHandler implements ClientListener{
 			}//end catch
 			cons.remove(ip);
 			cons.put(username,t);
-			t.createAccountResponce(username,1);
+			t.createAccountResponse(username,1);
 		}//end if
 		else{
-			t.createAccountResponce(username,0);
+			t.createAccountResponse(username,0);
 		}//end else
 	}//end create
 

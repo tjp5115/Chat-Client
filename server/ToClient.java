@@ -11,6 +11,8 @@
 import java.io.IOException;
 import java.net.*;
 import javax.net.ssl.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 
 /* class Description
 
@@ -22,6 +24,17 @@ import javax.net.ssl.*;
 public class ToClient implements ServerListener{
 
 	private SSLSocket sok;
+	private ClientListener clientListener;
+	private DataOutputStream out;
+	private DataInputStream in;
+
+	ToClient(SSLSocket _sok, ClientListener _clientListener) throws IOException{
+		sok = _sok;
+		out = new DataOutputStream (sok.getOutputStream());
+		in = new DataInputStream (sok.getInputStream());
+		clientListener = _clientListener;
+		new ReaderThread() .start();
+	}
 
 	/*this method returns the ssl socket of the toclient
 	@post: sslsocket- the connection
@@ -35,12 +48,15 @@ public class ToClient implements ServerListener{
 
     */
     public String getIP(){
-		return "NEEDS TO BE DONE";
+		return sok.getInetAddress().toString();
 	}//end
+
+
+
+
 
 	/*overrides equals
 	@override
-
 	*/
 	public boolean equals(final Object obj) {
 		ToClient t = (ToClient)obj;
@@ -57,7 +73,11 @@ public class ToClient implements ServerListener{
      * @throws IOException
      */
     public void userFriendStatus(String usr1, String usr2, int status) throws IOException{
-
+		out.writeByte ('F');
+		out.writeUTF(usr1);
+		out.writeUTF(usr2);
+		out.writeByte(status);
+		out.flush();
 	}//end user
 
     /**
@@ -67,7 +87,10 @@ public class ToClient implements ServerListener{
      * @throws IOException
      */
     public void IP(String user, String IP) throws IOException{
-
+		out.writeByte ('G');
+		out.writeUTF(user);
+		out.writeUTF(IP);
+		out.flush();
 	}//end ip
 
     /**
@@ -76,7 +99,9 @@ public class ToClient implements ServerListener{
      * @throws IOException
      */
     public void error(String error) throws IOException{
-
+		out.writeByte ('E');
+		out.writeUTF(error);
+		out.flush();
 	}//end error
 
     /**
@@ -87,11 +112,12 @@ public class ToClient implements ServerListener{
      *  0 - reject friend request
      * @throws IOException
      */
-    public void friendRequestResponse(String user, int status) throws IOException{
-
+    public void friendRequestResponse(String user, int status) throws IOException {
+		out.writeByte('R');
+		out.writeUTF(user);
+		out.writeByte(status);
+		out.flush();
 	}//end
-
-
 
     /**
      * initiate a conversation between two clients
@@ -100,16 +126,95 @@ public class ToClient implements ServerListener{
      * @throws IOException
      */
     public void initConversation(String from, String to) throws IOException{
-
+		out.writeByte ('S');
+		out.writeUTF(from);
+		out.writeUTF(to);
+		out.flush();
 	}
 
-
-    /*responce from server on either or not username was taken
+    /*response from server on either or not username was taken
     1 - you now have the username
     0 - that username is already taken
 
     */
-    public void createAccountResponce(String user, int i){
-
+    public void createAccountResponse(String user, int status) throws IOException {
+		out.writeByte ('C');
+		out.writeUTF(user);
+		out.writeByte(status);
+		out.flush();
 	}//end
+
+	/**
+	 * Class ReaderThread receives messages from the network, decodes them, and
+	 * invokes the proper methods to process them.
+	 *
+	 * @author:  Alan Kaminsky
+	 * @contributers: Samuel Launt, Tyler Paulsen, LAI CHUNG Lau
+	 * @version 3-23-2016
+	 */
+	private class ReaderThread
+			extends Thread
+	{
+		public void run()
+		{
+			try
+			{
+				for (;;)
+				{
+					String to,from,username;
+					int status;
+					byte b = in.readByte();
+					switch (b)
+					{
+						case 'F':
+							from = in.readUTF();
+							to = in.readUTF();
+							status = in.readByte();
+							clientListener.friendRequest(from, to, status);
+							break;
+						case 'R':
+							username = in.readUTF();
+							clientListener.createAccount(sok.getInetAddress().toString(),username);
+							break;
+						case 'J':
+							username = in.readUTF();
+							clientListener.logon(username);
+							break;
+						case 'Q':
+							username = in.readUTF();
+							clientListener.logoff(username);
+							break;
+						case 'S':
+							from = in.readUTF();
+							to = in.readUTF();
+							clientListener.initConversation(from,to);
+							break;
+						case 'G':
+							from = in.readUTF();
+							to = in.readUTF();
+							clientListener.getIP(from, to);
+							break;
+						default:
+							System.err.println ("Bad message");
+							break;
+					}
+				}
+			}
+			catch (IOException exc)
+			{
+			}
+			finally
+			{
+				try
+				{
+					sok.close();
+				}
+				catch (IOException exc)
+				{
+				}
+			}
+		}
+	}
+
+
 }//end class

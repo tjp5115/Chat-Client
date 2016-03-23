@@ -21,7 +21,7 @@ class Server
 {
 	public static void main(String args[]) throws Exception
 	{
-		if(args.length != 2) usgae();
+		if(args.length != 2) useage();
 		String host = args[0];
 		int port = Integer.parseInt(args[1]);
 
