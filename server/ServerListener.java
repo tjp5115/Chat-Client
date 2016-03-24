@@ -66,10 +66,13 @@ public interface ServerListener {
      */
     public void initConversation(String from, String to) throws IOException;
 
-    /*response from server on either or not username was taken
-    1 - you now have the username
-    0 - that username is already taken
-
-    */
+    /**
+     * response from server on either or not username was taken
+     * @param user username given to the server.
+     * @param status
+     *   1 - you now have the username
+     *   0 - that username is already taken
+     * @throws IOException
+     */
     public void createAccountResponse(String user, int status) throws IOException;
 }
