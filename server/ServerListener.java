@@ -75,4 +75,5 @@ public interface ServerListener {
      * @throws IOException
      */
     public void createAccountResponse(String user, int status) throws IOException;
+
 }

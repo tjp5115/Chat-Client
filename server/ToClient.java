@@ -28,12 +28,18 @@ public class ToClient implements ServerListener{
 	private DataOutputStream out;
 	private DataInputStream in;
 
+	/**
+	 *  Constructor for the ToClient connection
+	 * @param _sok - SSL socket
+	 * @param _clientListener - database reference;
+	 * @throws IOException
+	 */
 	ToClient(SSLSocket _sok, ClientListener _clientListener) throws IOException{
 		sok = _sok;
 		out = new DataOutputStream (sok.getOutputStream());
 		in = new DataInputStream (sok.getInputStream());
 		clientListener = _clientListener;
-		new ReaderThread() .start();
+		new ReaderThread().start();
 	}
 
 	/*this method returns the ssl socket of the toclient
@@ -50,10 +56,6 @@ public class ToClient implements ServerListener{
     public String getIP(){
 		return sok.getInetAddress().toString();
 	}//end
-
-
-
-
 
 	/*overrides equals
 	@override
@@ -161,7 +163,7 @@ public class ToClient implements ServerListener{
 			{
 				for (;;)
 				{
-					String to,from,username;
+					String to,from,username,ip;
 					int status;
 					byte b = in.readByte();
 					switch (b)
@@ -173,8 +175,9 @@ public class ToClient implements ServerListener{
 							clientListener.friendRequest(from, to, status);
 							break;
 						case 'R':
+							ip = in.readUTF();
 							username = in.readUTF();
-							clientListener.createAccount(sok.getInetAddress().toString(),username);
+							clientListener.createAccount(ip, username);
 							break;
 						case 'J':
 							username = in.readUTF();

@@ -10,6 +10,8 @@
 
 //imports go here
 
+import java.io.IOException;
+
 /*
  * Interface PeerListener specifies the interface for an object that is
  * triggered by events between two clients in the chat program.
@@ -25,17 +27,17 @@ public interface PeerListener {
      * @param to - who the message is too.
      * @param msg - the message.
      */
-    void message(String from, String to, String msg);
+    void message(String from, String to, String msg) throws IOException;
 
     /**
      * Requests a chat session to begin between two users.
      * @param user - user requesting a chat session.
      */
-    void start(String user);
+    void start(String user) throws IOException;
 
     /**
      * Stops a chat session between two users.
      * @param user - user to stop the session from.
      */
-    void stop(String user);
+    void stop(String user) throws IOException;
 }
