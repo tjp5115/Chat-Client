@@ -69,15 +69,17 @@ public class ToClient implements ServerListener{
 
     /**
      * request for a friend from a given user.
-     * @param usr1 - requestee
-     * @param usr2 - requested.
+     * @param from - requestee
+	 * @param from_hash - Verify user.
+     * @param to - requested.
      * @param status - status of the friend request.
      * @throws IOException
      */
-    public void userFriendStatus(String usr1, String usr2, int status) throws IOException{
+    public void userFriendStatus(String from, String from_hash, String to, int status) throws IOException{
 		out.writeByte ('F');
-		out.writeUTF(usr1);
-		out.writeUTF(usr2);
+		out.writeUTF(from);
+		out.writeUTF(from_hash);
+		out.writeUTF(to);
 		out.writeByte(status);
 		out.flush();
 	}//end user
@@ -85,12 +87,14 @@ public class ToClient implements ServerListener{
     /**
      * return the IP of a user
      * @param user - user name of the IP
+	 * @param user_hash - Verify user.
      * @param IP - IP address of the user.
      * @throws IOException
      */
-    public void IP(String user, String IP) throws IOException{
+    public void IP(String user, String user_hash, String IP) throws IOException{
 		out.writeByte ('G');
 		out.writeUTF(user);
+		out.writeUTF(user_hash);
 		out.writeUTF(IP);
 		out.flush();
 	}//end ip
@@ -124,12 +128,14 @@ public class ToClient implements ServerListener{
     /**
      * initiate a conversation between two clients
      * @param from - initiator
-     * @param to - responder
+	 * @param from_hash - verify user
+	 * @param to - responder
      * @throws IOException
      */
-    public void initConversation(String from, String to) throws IOException{
+    public void initConversation(String from, String from_hash, String to) throws IOException{
 		out.writeByte ('S');
 		out.writeUTF(from);
+		out.writeUTF(from_hash);
 		out.writeUTF(to);
 		out.flush();
 	}
@@ -163,39 +169,45 @@ public class ToClient implements ServerListener{
 			{
 				for (;;)
 				{
-					String to,from,username,ip;
+					String to,from,username,ip,hash;
 					int status;
 					byte b = in.readByte();
 					switch (b)
 					{
 						case 'F':
 							from = in.readUTF();
+							hash = in.readUTF();
 							to = in.readUTF();
 							status = in.readByte();
-							clientListener.friendRequest(from, to, status);
+							clientListener.friendRequest(from, hash, to, status);
 							break;
 						case 'R':
 							ip = in.readUTF();
 							username = in.readUTF();
-							clientListener.createAccount(ip, username);
+							hash = in.readUTF();
+							clientListener.createAccount(ip, username, hash);
 							break;
 						case 'J':
 							username = in.readUTF();
-							clientListener.logon(username);
+							hash = in.readUTF();
+							clientListener.logon(username, hash);
 							break;
 						case 'Q':
 							username = in.readUTF();
-							clientListener.logoff(username);
+							hash = in.readUTF();
+							clientListener.logoff(username, hash);
 							break;
 						case 'S':
 							from = in.readUTF();
+							hash = in.readUTF();
 							to = in.readUTF();
-							clientListener.initConversation(from,to);
+							clientListener.initConversation(from, hash, to);
 							break;
 						case 'G':
 							from = in.readUTF();
+							hash = in.readUTF();
 							to = in.readUTF();
-							clientListener.getIP(from, to);
+							clientListener.getIP(from, hash, to);
 							break;
 						default:
 							System.err.println ("Bad message");

@@ -53,9 +53,10 @@ public class ServerConnection implements ClientListener{
      * @throws IOException
      */
     @Override
-    public void friendRequest(String from, String to, int status) throws IOException {
+    public void friendRequest(String from, String from_hash, String to, int status) throws IOException {
         out.writeByte ('F');
         out.writeUTF(from);
+        out.writeUTF(from_hash);
         out.writeUTF(to);
         out.writeByte(status);
         out.flush();
@@ -66,13 +67,15 @@ public class ServerConnection implements ClientListener{
      *
      * @param ip
      * @param username @throws IOException
+     * @param username_hash - hash to verify from.
      * @parm: String - the ip of this user
      */
     @Override
-    public void createAccount(String ip, String username) throws IOException {
+    public void createAccount(String ip, String username, String username_hash) throws IOException {
         out.writeByte('R');
         out.writeUTF(ip);
         out.writeUTF(username);
+        out.writeUTF(username_hash);
         out.flush();
     }
 
@@ -91,12 +94,14 @@ public class ServerConnection implements ClientListener{
      * log on trigger
      *
      * @param user - user to log on
+     * @param user_hash - hash to verify from.
      * @throws IOException
      */
     @Override
-    public void logon(String user) throws IOException {
+    public void logon(String user, String user_hash) throws IOException {
         out.writeByte('J');
         out.writeUTF(user);
+        out.writeUTF(user_hash);
         out.flush();
     }
 
@@ -104,12 +109,14 @@ public class ServerConnection implements ClientListener{
      * log off trigger
      *
      * @param user - user to log off
+     * @param user_hash - hash to verify from.
      * @throws IOException
      */
     @Override
-    public void logoff(String user) throws IOException {
+    public void logoff(String user, String user_hash) throws IOException {
         out.writeByte('Q');
         out.writeUTF(user);
+        out.writeUTF(user_hash);
         out.flush();
     }
 
@@ -117,13 +124,15 @@ public class ServerConnection implements ClientListener{
      * initiate a conversation between two clients
      *
      * @param from - initiator
+     * @param from_hash - hash to verify from.
      * @param to   - responder
      * @throws IOException
      */
     @Override
-    public void initConversation(String from, String to) throws IOException {
+    public void initConversation(String from, String from_hash, String to) throws IOException {
         out.writeByte('S');
         out.writeUTF(from);
+        out.writeUTF(from_hash);
         out.writeUTF(to);
         out.flush();
     }
@@ -132,13 +141,15 @@ public class ServerConnection implements ClientListener{
      * get the ip of a user
      *
      * @param from - who the request is from
+     * @param from_hash - hash to verify from.
      * @param to   - what user to get the IP from
      * @throws IOException
      */
     @Override
-    public void getIP(String from, String to) throws IOException {
+    public void getIP(String from, String from_hash, String to) throws IOException {
         out.writeByte('G');
         out.writeUTF(from);
+        out.writeUTF(from_hash);
         out.writeUTF(to);
         out.flush();
     }
@@ -160,21 +171,23 @@ public class ServerConnection implements ClientListener{
             {
                 for (;;)
                 {
-                    String to,from,username,ip,error;
+                    String to,from,username,ip,error, hash;
                     int status;
                     byte b = in.readByte();
                     switch (b)
                     {
                         case 'F':
                             from = in.readUTF();
+                            hash = in.readUTF();
                             to = in.readUTF();
                             status = in.readByte();
-                            serverListener.userFriendStatus(from, to, status);
+                            serverListener.userFriendStatus(from, hash, to, status);
                             break;
                         case 'G':
                             username = in.readUTF();
+                            hash = in.readUTF();
                             ip = in.readUTF();
-                            serverListener.IP(username, ip);
+                            serverListener.IP(username, hash, ip);
                             break;
                         case 'E':
                             error = in.readUTF();

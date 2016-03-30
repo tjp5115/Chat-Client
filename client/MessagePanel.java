@@ -20,7 +20,9 @@ import java.awt.*;
 
 */
 public class MessagePanel extends JPanel{
-    MessagePanel(){
+    private ChatFrame chatFrame;
+    MessagePanel(ChatFrame cf){
+        chatFrame = cf;
         GridLayout grid = new GridLayout(3,1);
         setLayout(grid);
         add(new JButton("Chat Section"));

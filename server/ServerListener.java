@@ -24,20 +24,22 @@ import java.io.IOException;
 public interface ServerListener {
     /**
      * request for a friend from a given user.
-     * @param usr1 - requestee
-     * @param usr2 - requested.
+     * @param from - requester user.
+     * @param from_hash - hash to verify from.
+     * @param to - requested user.
      * @param status - status of the friend request.
      * @throws IOException
      */
-    public void userFriendStatus(String usr1, String usr2, int status) throws IOException;
+    public void userFriendStatus(String from,  String from_hash, String to, int status) throws IOException;
 
     /**
      * return the IP of a user
      * @param user - user to the IP
+     * @param user_hash -hash to verify from.
      * @param IP - IP address of the user.
      * @throws IOException
      */
-    public void IP(String user, String IP) throws IOException;
+    public void IP(String user, String user_hash, String IP) throws IOException;
 
     /**
      * return an error.
@@ -61,10 +63,11 @@ public interface ServerListener {
     /**
      * initiate a conversation between two clients
      * @param from - initiator
+     * @param from_hash -hash to verify from.
      * @param to - responder
      * @throws IOException
      */
-    public void initConversation(String from, String to) throws IOException;
+    public void initConversation(String from, String from_hash, String to) throws IOException;
 
     /**
      * response from server on either or not username was taken

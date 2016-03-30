@@ -21,14 +21,14 @@ import java.awt.*;
 
 public class FriendPanel extends JPanel {
 
-    JScrollPane scrollPane;
-    JPanel friends;
-    JPanel options;
-    Dimension dim;
-    FriendPanel(Dimension _dim){
-        setLayout(new BorderLayout());
-        dim = _dim;
+    private JScrollPane scrollPane;
+    private JPanel friends;
+    private JPanel options;
+    private ChatFrame chatFrame;
+    FriendPanel(ChatFrame cf, Dimension dim){
+        chatFrame = cf;
         setPreferredSize(dim);
+        setLayout(new BorderLayout());
         Dimension friendDim = new Dimension(dim.width, (int) (dim.height * 0.7));
         Dimension optionsDim= new Dimension(dim.width, (int) (dim.height * 0.2));
         Dimension buttonSize = new Dimension(friendDim.width,friendDim.height/10);
