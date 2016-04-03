@@ -67,6 +67,7 @@ public class ToClient implements ServerListener{
 	}//end
 
 
+
     /**
      * request for a friend from a given user.
      * @param from - requestee
@@ -75,10 +76,10 @@ public class ToClient implements ServerListener{
      * @param status - status of the friend request.
      * @throws IOException
      */
-    public void userFriendStatus(String from, String from_hash, String to, int status) throws IOException{
+    public void userFriendStatus(String from, String to, int status) throws IOException{
 		out.writeByte ('F');
 		out.writeUTF(from);
-		out.writeUTF(from_hash);
+		//out.writeUTF(from_hash);
 		out.writeUTF(to);
 		out.writeByte(status);
 		out.flush();
@@ -91,10 +92,10 @@ public class ToClient implements ServerListener{
      * @param IP - IP address of the user.
      * @throws IOException
      */
-    public void IP(String user, String user_hash, String IP) throws IOException{
+    public void IP(String user, String IP) throws IOException{
 		out.writeByte ('G');
 		out.writeUTF(user);
-		out.writeUTF(user_hash);
+		//out.writeUTF(user_hash);
 		out.writeUTF(IP);
 		out.flush();
 	}//end ip
@@ -128,14 +129,13 @@ public class ToClient implements ServerListener{
     /**
      * initiate a conversation between two clients
      * @param from - initiator
-	 * @param from_hash - verify user
 	 * @param to - responder
      * @throws IOException
      */
-    public void initConversation(String from, String from_hash, String to) throws IOException{
+    public void initConversation(String from, String to) throws IOException{
 		out.writeByte ('S');
 		out.writeUTF(from);
-		out.writeUTF(from_hash);
+		//out.writeUTF(from_hash);
 		out.writeUTF(to);
 		out.flush();
 	}
@@ -179,7 +179,7 @@ public class ToClient implements ServerListener{
 							hash = in.readUTF();
 							to = in.readUTF();
 							status = in.readByte();
-							clientListener.friendRequest(from, hash, to, status);
+							clientListener.friendRequest(from,to,hash,status);
 							break;
 						case 'R':
 							ip = in.readUTF();

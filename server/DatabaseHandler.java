@@ -13,7 +13,8 @@ import java.io.IOException;
 import java.sql.*;
 
 /* This class handles all requests from the clients, it also
-makes the nessitary SQL calls to the database.
+makes the nessitary SQL calls to the database. Before you can use anymethods the toClient
+That is making the calls needs to add its self to this class through the add method!
 
 @authors: Samuel Launt, Tyler Paulsen, LAI CHUNG Lau
 @emails: stl7199@rit.edu, tjp5115@rit.edu, lxl3375@rit.edu
@@ -53,7 +54,7 @@ public class DatabaseHandler implements ClientListener{
 	private void init(){
 		try{
 			Statement stmt = conn.createStatement();
-			stmt.execute("CREATE TABLE users(USER VARCHAR(255) PRIMARY KEY, IP VARCHAR(25), ONLINE BOOLEAN);");
+			stmt.execute("CREATE TABLE users(USER VARCHAR(255) PRIMARY KEY, IP VARCHAR(25), ONLINE BOOLEAN, HASH VARCHAR(255));");
 			stmt.execute("CREATE TABLE messages(MESSAGE VARCHAR(255), FOREIGN KEY(USER) REFERENCES USERS);");
 		}//end try
 		catch(SQLException e){
@@ -63,10 +64,13 @@ public class DatabaseHandler implements ClientListener{
 	}//end init
 
 	/*this method adds a connection
+		@parm: String username
+		@parm: String hash
+		@parm: Toclient the conection to user
 
 	*/
-	public synchronized void add(String name, ToClient c){
-		cons.put(name,c);
+	public synchronized void add(String name, String hash, ToClient c){
+		cons.put(name.concat(hash),c);
 	}//end add
 
 
@@ -80,24 +84,30 @@ public class DatabaseHandler implements ClientListener{
      *              2 - reject
      * @throws IOException
      */
-    public synchronized void friendRequest( String from, String to, int status) throws IOException{
-		ToClient t = cons.get(to);
-		//client isn't online
-		if(t == null){
-			try{
-				Statement stmt = conn.createStatement();
-				stmt.execute("INSERT INTO messages VALUES(\"" + from + " " + to + " " + status + "\"," + to+";");
-			}//end try
-			catch(SQLException e){
-				System.out.println("error inserting into messages");
-				e.printStackTrace();
-			}//end catch
-		}//end if
+    public synchronized void friendRequest(String from, String from_hash, String to, int status) throws IOException{
+		if(check(from, from_hash)){
+			ToClient t = cons.get(to.concat(from_hash));
+			//client isn't online
+			if(t == null){
+				try{
+					Statement stmt = conn.createStatement();
+					stmt.execute("INSERT INTO messages VALUES(\"" + from + " " + to + " " + status + "\"," + to+";");
+				}//end try
+				catch(SQLException e){
+					System.out.println("error friend request");
+					e.printStackTrace();
+				}//end catch
+			}//end if
 
-		//if client is online
+			//if client is online
+			else{
+				t.userFriendStatus(from, to, status);
+			}//end
+		}//end if
 		else{
-			t.userFriendStatus(from, to, status);
-		}//end
+			ToClient t = cons.get(to.concat(from_hash));
+			t.error("Your not authehtic!");
+		}
 	}//end friend
 
     /**
@@ -106,23 +116,37 @@ public class DatabaseHandler implements ClientListener{
      * @param username
      * @throws IOException
      */
-    public synchronized void createAccount(String ip, String username) throws IOException{
+    public synchronized void createAccount(String ip, String username, String username_hash) throws IOException{
 		ToClient t = cons.get(ip);
-		ToClient n = cons.get(username);
-		if(username == null){
+		boolean c = false;
+		//check to see if username is already used
+		try{
+			Statement stmt = conn.createStatement();
+			ResultSet s = stmt.executeQuery("SELECT USER FROM USERS WHERE UESR=\'" + username + "\';");
+			String test = s.getString(1);
+			if(test == null){
+			 c = true;
+			}//end if
+		}//end try
+		catch(SQLException e){
+			System.out.println("error checking if username is taken");
+			e.printStackTrace();
+		}//end catch
+		if(c){
+			//adding user
 			try{
 				Statement stmt = conn.createStatement();
-				stmt.execute("INSERT INTO users VALUES(\"" + username + "\",\"" + ip + "\",TRUE;");
+				stmt.execute("INSERT INTO users VALUES(\"" + username + "\",\"" + ip + "\",TRUE, \'" + username_hash + "\');");
 			}//end try
 			catch(SQLException e){
-				System.out.println("error inserting into messages");
+				System.out.println("error createaccount");
 				e.printStackTrace();
 			}//end catch
 			cons.remove(ip);
 			cons.put(username,t);
 			t.createAccountResponse(username,1);
 		}//end if
-		else{
+		else{//rejected
 			t.createAccountResponse(username,0);
 		}//end else
 	}//end create
@@ -140,18 +164,24 @@ public class DatabaseHandler implements ClientListener{
      * @param user - user to log on
      * @throws IOException
      */
-    public synchronized void logon(String user) throws IOException{
-		ToClient t = cons.get(user);
-		try{
-			Statement stmt = conn.createStatement();
-			stmt.execute("UPDATE users " +
-				"SET IP=" + t.getIP() +", ONLINE=TRUE"
-				+ " WHERE USER=" + user + ";");
-		}//end try
-		catch(SQLException e){
-			System.out.println("error inserting into messages");
-			e.printStackTrace();
-		}//end catch
+    public synchronized void logon(String user, String user_hash) throws IOException{
+		if(check(user,user_hash)){
+			ToClient t = cons.get(user.concat(user_hash));
+			try{
+				Statement stmt = conn.createStatement();
+				stmt.execute("UPDATE users " +
+					"SET IP=" + t.getIP() +", ONLINE=TRUE"
+					+ " WHERE USER=" + user + ";");
+			}//end try
+			catch(SQLException e){
+				System.out.println("error logon");
+				e.printStackTrace();
+			}//end catch
+		}//end if
+		else{
+			ToClient t = cons.get(user.concat(user_hash));
+			t.error("Your not authehtic!");
+		}
 	}//endlogon
 
     /**
@@ -159,17 +189,24 @@ public class DatabaseHandler implements ClientListener{
      * @param user - user to log off
      * @throws IOException
      */
-    public synchronized void logoff(String user) throws IOException{
-		try{
-			Statement stmt = conn.createStatement();
-			stmt.execute("UPDATE users " +
-				"SET IP=\"0.0.0.0\", ONLINE=FALSE"
-				+ " WHERE USER=" + user + ";");
-		}//end try
-		catch(SQLException e){
-			System.out.println("error inserting into messages");
-			e.printStackTrace();
-		}//end catch
+    public synchronized void logoff(String user, String user_hash) throws IOException{
+		if(check(user,user_hash)){
+			try{
+				Statement stmt = conn.createStatement();
+				stmt.execute("UPDATE users " +
+					"SET IP=\"0.0.0.0\", ONLINE=FALSE"
+					+ " WHERE USER=" + user + ";");
+			}//end try
+			catch(SQLException e){
+				System.out.println("error logoff");
+				e.printStackTrace();
+			}//end catch
+			cons.remove(user.concat(user_hash));
+		}//end if
+		else{
+			ToClient t = cons.get(user.concat(user_hash));
+			t.error("Your not authehtic!");
+		}
 	}//end logoff
 
     /**
@@ -178,16 +215,31 @@ public class DatabaseHandler implements ClientListener{
      * @param to - responder
      * @throws IOException
      */
-    public synchronized void initConversation(String from, String to) throws IOException{
-		ToClient t = cons.get(to);
-		if(t == null){
-			ToClient n = cons.get(from);
-			n.error(to + " is not online");
+    public synchronized void initConversation(String from, String from_hash, String to) throws IOException{
+		if(check(from,from_hash)){
+			ToClient t = null;
+			try{
+				Statement stmt = conn.createStatement();
+				ResultSet s = stmt.executeQuery("SELECT HASH FROM USERS WHERE UESR=\'" + from + "\';");
+				String test = s.getString(1);
+				t = cons.get(to.concat(test));
+			}//end try
+			catch(SQLException e){
+				System.out.println("error checking if username is taken");
+				e.printStackTrace();
+			}//end catch
+			if(t == null){
+				ToClient n = cons.get(from);
+				n.error(to + " is not online");
+			}//end if
+			else{
+				t.initConversation(from,to);
+			}//end
 		}//end if
 		else{
-			t.initConversation(from,to);
-		}//end
-
+			ToClient t = cons.get(from.concat(from_hash));
+			t.error("Your not authehtic!");
+		}
 	}//end init
 
     /**
@@ -196,22 +248,49 @@ public class DatabaseHandler implements ClientListener{
      * @param to - what user to get the IP from
      * @throws IOException
      */
-    public synchronized void getIP(String from, String to) throws IOException{
-		ToClient t = cons.get(to);
-		if(t != null){
-			try{
-				Statement stmt = conn.createStatement();
-				ResultSet s = stmt.executeQuery("SELECT IP FROM USERS WHERE USER=" + to + ";");
-				t.IP(to,s.getString(1));
-			}//end try
-			catch(SQLException e){
-				System.out.println("error inserting into messages");
-				e.printStackTrace();
-			}//end catch
+    public synchronized void getIP(String from, String from_hash, String to) throws IOException{
+		if(check(from,from_hash)){
+			ToClient t = cons.get(to);
+			ToClient n = cons.get(from.concat(from_hash));
+			if(t != null){
+				try{
+					Statement stmt = conn.createStatement();
+					ResultSet s = stmt.executeQuery("SELECT IP FROM USERS WHERE USER=\'" + to + "\';");
+					n.IP(to,s.getString(1));
+				}//end try
+				catch(SQLException e){
+					System.out.println("error getIP");
+					e.printStackTrace();
+				}//end catch
+			}//end if
+			else{
+				n.error(to + " is not online");
+			}
 		}//end if
 		else{
-			ToClient n = cons.get(from);
-			n.error(to + " is not online");
+			ToClient t = cons.get(from.concat(from_hash));
+			t.error("Your not authehtic!");
 		}
 	}//end getIP
+
+
+	/*this method checks to see if the person who sent this message is authentic
+	@parm: String - username
+	@parm: String - hash
+	@post: boolean - are they authentic?
+
+	*/
+	private synchronized boolean check(String name, String hash){
+		boolean ans = false;
+		try{
+			Statement stmt = conn.createStatement();
+			ResultSet s = stmt.executeQuery("SELECT HASH FROM USERS WHERE USER=\'" + name + "\';");
+			ans = hash.equals(s.getString(1));
+		}//end try
+		catch(SQLException e){
+			System.out.println("error check");
+			e.printStackTrace();
+		}//end catch
+		return ans;
+	}//end
 }//end class
