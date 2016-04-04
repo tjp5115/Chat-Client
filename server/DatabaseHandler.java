@@ -73,6 +73,16 @@ public class DatabaseHandler implements ClientListener{
 		cons.put(name.concat(hash),c);
 	}//end add
 
+	/*this method adds a connection
+		@parm: String ip
+		@parm: Toclient the conection to user
+
+	*/
+	public synchronized void add(String ip, ToClient c){
+		cons.put(ip,c);
+	}//end add
+
+
 
 	/**
      * friend request between two users

@@ -36,6 +36,27 @@ public interface ClientListener {
      */
     public void friendRequest( String from, String from_hash, String to, int status) throws IOException;
 
+
+	/*this method adds a connection
+		@parm: String username
+		@parm: String hash
+		@parm: Toclient the conection to user
+
+	*/
+	public void add(String name, String hash, ToClient c);
+
+
+
+	/*this method adds a connection
+		@parm: String ip
+		@parm: Toclient the conection to user
+
+	*/
+	public void add(String ip, ToClient c);
+
+
+
+
     /**
      * creates an account for a user
      * @param ip - the ip of this user

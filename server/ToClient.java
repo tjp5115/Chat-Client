@@ -27,6 +27,7 @@ public class ToClient implements ServerListener{
 	private ClientListener clientListener;
 	private DataOutputStream out;
 	private DataInputStream in;
+	private ToClient toc;
 
 	/**
 	 *  Constructor for the ToClient connection
@@ -39,6 +40,7 @@ public class ToClient implements ServerListener{
 		out = new DataOutputStream (sok.getOutputStream());
 		in = new DataInputStream (sok.getInputStream());
 		clientListener = _clientListener;
+		toc = this;
 		new ReaderThread().start();
 	}
 
@@ -185,11 +187,13 @@ public class ToClient implements ServerListener{
 							ip = in.readUTF();
 							username = in.readUTF();
 							hash = in.readUTF();
+							clientListener.add(getIP(), toc);
 							clientListener.createAccount(ip, username, hash);
 							break;
 						case 'J':
 							username = in.readUTF();
 							hash = in.readUTF();
+							clientListener.add(username, hash,toc);
 							clientListener.logon(username, hash);
 							break;
 						case 'Q':
