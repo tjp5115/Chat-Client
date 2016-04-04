@@ -149,4 +149,22 @@ public class DatabaseHandler{
         return f;
 	}//end
 
+	/*this method returns the server IP
+	@post: String server IP in for X.X.X.X
+
+	*/
+	public String getServerIP(){
+		return new String();
+	}//end
+
+
+	/*this method returns the username of the person whose database
+	this is
+	@post: String - username
+
+	*/
+	public String getName(){
+		return new String();
+	}//end
+
 }//end class
