@@ -26,6 +26,6 @@ interface ClientListener
 	void createAccount(String ip, String username, String username_hash) throws IOException ;
 	void initConnection() throws IOException;
 	void logon(String user, String user_hash) throws IOException;
-	void logoff(String user, String user_hash) throws IOException
+	void logoff(String user, String user_hash) throws IOException;
 
 }
