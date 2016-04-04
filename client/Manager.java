@@ -9,10 +9,10 @@
  */
 
 //imports go here
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 import java.io.*;
-import java.net.*;
-import java.net.ssl.*;
-import java.security.*;
+import java.util.ArrayList;
 
 /* class Description
 
@@ -24,8 +24,8 @@ import java.security.*;
 
 class Manager
 {
-	private static final ChatFrame GUI;
-	private static final String SERVER_HOST;
+	private ChatFrame GUI;
+	private String SERVER_HOST;
 	private ServerConnection serverConnection;
 	private ArrayList<ClientConnection> clientConnectionList;
 	//port 0 for peer to peer
@@ -36,9 +36,22 @@ class Manager
 		this.SERVER_HOST = "";
 	}
 
-	public void createClientConnection()
+	/**
+	 * get ip of the user
+	 * @return ip;
+	 */
+	public String getIP(){
+		return "";
+	}
+	/**
+	 * set up the peer connection between two clients. Assumes the establishment process has been completed.
+	 * @param ip
+	 * @return
+	 */
+	//todo
+	public PeerListener createClientConnection(String ip)
 	{
-
+		return null;
 	}
 
 	//send initial message to Server when the program start
@@ -50,8 +63,9 @@ class Manager
 			SSLSocket c = (SSLSocket) sf.createSocket(SERVER_HOST, 5432);
 			serverConnection = new ServerConnection(c, GUI);
 			GUI.setClientListener(serverConnection);
-			//send initial connection to server
-			serverConnection.initConnection();
+		}catch (IOException ioe){
+			System.err.println("IOException caught. Exiting");
+			System.exit(1);
 		}
 	}
 }

@@ -11,6 +11,11 @@
 //imports go here
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.util.ArrayList;
 
 /* Left panel for the ChatFrame gui. Has a list of friends, and can the buttons to init a chat.
 
@@ -22,35 +27,27 @@ import java.awt.*;
 public class FriendPanel extends JPanel {
 
     private JScrollPane scrollPane;
-    private JPanel friends;
+    private JPanel friendsPanel;
     private JPanel options;
     private ChatFrame chatFrame;
-    FriendPanel(ChatFrame cf, Dimension dim){
+    private ArrayList<String> friends;
+    Dimension buttonSize;
+    FriendPanel(ChatFrame cf, Dimension dim, ArrayList<String> friends){
+        this.friends = friends;
+        for(String f: friends)
+            addFriend(f);
+
         chatFrame = cf;
         setPreferredSize(dim);
         setLayout(new BorderLayout());
         Dimension friendDim = new Dimension(dim.width, (int) (dim.height * 0.7));
         Dimension optionsDim= new Dimension(dim.width, (int) (dim.height * 0.2));
-        Dimension buttonSize = new Dimension(friendDim.width,friendDim.height/10);
+        buttonSize = new Dimension(friendDim.width,friendDim.height/10);
 
-        friends = new JPanel();
-        friends.setLayout(new WrapLayout());
-        friends.add(new FriendButton("Jimmy", buttonSize));
-        friends.add(new FriendButton("Jimmy", buttonSize));
-        friends.add(new FriendButton("Jimmy", buttonSize));
-        friends.add(new FriendButton("Jimmy", buttonSize));
-        friends.add(new FriendButton("Jimmy", buttonSize));
-        friends.add(new FriendButton("Jimmy", buttonSize));
-        friends.add(new FriendButton("wasdasdJimmy", buttonSize));
-        friends.add(new FriendButton("wasdasdJimmy", buttonSize));
-        friends.add(new FriendButton("wasdasdJimmy", buttonSize));
-        friends.add(new FriendButton("wasdasdJimmy", buttonSize));
-        friends.add(new FriendButton("wasdasdJimmy", buttonSize));
-        friends.add(new FriendButton("wasdasdJimmy", buttonSize));
-        friends.add(new FriendButton("wasdasdJimmy", buttonSize));
-        friends.add(new FriendButton("wasdasdJimmy", buttonSize));
-        friends.add(new FriendButton("wasdasdJimmy", buttonSize));
-        scrollPane = new JScrollPane(friends,
+        friendsPanel = new JPanel();
+        friendsPanel.setLayout(new WrapLayout());
+
+        scrollPane = new JScrollPane(friendsPanel,
                 ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setPreferredSize(friendDim);
@@ -58,9 +55,21 @@ public class FriendPanel extends JPanel {
 
         options = new JPanel();
         options.setLayout(new WrapLayout());
-        JButton add = new JButton("Add Friend");
-        add.setPreferredSize(buttonSize);
-        options.add(add);
+        JButton addFriend = new JButton("Add Friend");
+        addFriend.setPreferredSize(buttonSize);
+        addFriend.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String s = (String)JOptionPane.showInputDialog(null,
+                        "What friend to add?",
+                        "Add Friend",
+                        JOptionPane.PLAIN_MESSAGE);
+                if ((s!=null)){
+                    chatFrame.friendRequest(s);
+                }
+            }
+        });
+        options.add(addFriend);
 
         JButton remove = new JButton("Remove Friend");
         remove.setPreferredSize(buttonSize);
@@ -69,10 +78,22 @@ public class FriendPanel extends JPanel {
         add(options, BorderLayout.SOUTH);
     }
 
+    public void addFriend(String friend){
+        friendsPanel.add(new FriendButton(friend, buttonSize));
+    }
+
     class FriendButton extends JButton{
+        private String name;
         FriendButton(String name, Dimension dim){
             super(name);
+            this.name = name;
             setPreferredSize(dim);
+            addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    chatFrame.setMessagePanelUser(name);
+                }
+            });
         }
     }
 

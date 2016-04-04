@@ -14,6 +14,7 @@
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 
 /* Panel for the register portion of the gui.
 
@@ -22,10 +23,10 @@ import java.awt.event.ActionListener;
 
 */
 public class RegisterPanel extends JPanel{
-    JButton createUserButton, filePathButton;
-    JLabel userLabel, passwordLabel, IPLabel;
-    JTextField userText, databaseText, IPText;
-    JPasswordField passwordText;
+    private JButton createUserButton, filePathButton;
+    private JLabel userLabel, passwordLabel, IPLabel;
+    private JTextField userText, databaseText, IPText;
+    private JPasswordField passwordText;
     private ChatFrame chatFrame;
 
     RegisterPanel(ChatFrame cf){
@@ -77,14 +78,21 @@ public class RegisterPanel extends JPanel{
         databaseText.setBounds(100, 100, 260, 25);
         add(databaseText);
 
-        createUserButton = new JButton("login");
+        createUserButton = new JButton("Create User");
         createUserButton.setBounds(100, 140, 80, 25);
         createUserButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //todo loging verification
+                chatFrame.registerUsername();
             }
         });
         add(createUserButton);
+    }
+
+    public String getUsername(){
+        return userText.getText();
+    }
+    public String getPassword(){
+        return Arrays.toString(passwordText.getPassword());
     }
 }

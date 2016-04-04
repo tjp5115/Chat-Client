@@ -13,6 +13,8 @@
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.Arrays;
 
 /* Panel for the login portion of the gui.
 
@@ -23,8 +25,8 @@ import java.awt.event.ActionListener;
 public class LoginPanel extends JPanel {
 
     private JButton newUser, loginButton, filePathButton;
-    private JLabel  passwordLabel;
-    private JTextField databaseText;
+    private JLabel  passwordLabel, usernameLabel;
+    private JTextField databaseText,usernameText;
     private JPasswordField passwordText;
     private ChatFrame chatFrame;
 
@@ -60,18 +62,27 @@ public class LoginPanel extends JPanel {
         passwordText.setBounds(100, 40, 260, 25);
         add(passwordText);
 
+        usernameLabel = new JLabel("Username");
+        usernameLabel.setBounds(10, 70, 80, 25);
+        add(usernameLabel);
+
+        usernameText = new JTextField(20);
+        usernameText.setBounds(100, 70, 260, 25);
+        add(usernameText);
+
         loginButton = new JButton("login");
-        loginButton.setBounds(10, 80, 80, 25);
+        loginButton.setBounds(10, 110, 80, 25);
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //todo loging verification
+                //todo login verification
+                chatFrame.logon();
             }
         });
         add(loginButton);
 
         newUser = new JButton("register");
-        newUser.setBounds(180, 80, 80, 25);
+        newUser.setBounds(180, 110, 80, 25);
         newUser.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -81,19 +92,16 @@ public class LoginPanel extends JPanel {
         add(newUser);
     }
 
-    public void message(String from, String to, String msg) throws IOException
-    {
-
+    public String getPath(){
+        return databaseText.getText();
     }
 
-    public void start(String user) throws IOException
-    {
-
+    public String getPassword(){
+        return Arrays.toString(passwordText.getPassword());
     }
 
-    public void stop(String user) throws IOException
-    {
-        
+    public String getUsername(){
+        return usernameText.getText();
     }
 
 }

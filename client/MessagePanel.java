@@ -21,10 +21,16 @@ import java.awt.*;
 */
 public class MessagePanel extends JPanel{
     private ChatFrame chatFrame;
-    MessagePanel(ChatFrame cf){
+    private String user;
+    MessagePanel(ChatFrame cf, String user){
+        this.user = user;
         chatFrame = cf;
         GridLayout grid = new GridLayout(3,1);
         setLayout(grid);
         add(new JButton("Chat Section"));
+    }
+
+    public void addMessage(String user, String message){
+
     }
 }

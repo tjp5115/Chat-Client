@@ -80,17 +80,6 @@ public class ServerConnection implements ClientListener{
     }
 
     /**
-     * initiates a connection between two nodes
-     *
-     * @throws IOException
-     */
-    @Override
-    public void initConnection() throws IOException {
-        out.writeByte ('S');
-        out.flush();
-    }
-
-    /**
      * log on trigger
      *
      * @param user - user to log on
@@ -124,7 +113,7 @@ public class ServerConnection implements ClientListener{
      * initiate a conversation between two clients
      *
      * @param from - initiator
-     * @param from_hash - hash to verify from.
+     * @param from_hash - initiator
      * @param to   - responder
      * @throws IOException
      */
@@ -178,26 +167,28 @@ public class ServerConnection implements ClientListener{
                     {
                         case 'F':
                             from = in.readUTF();
-                            hash = in.readUTF();
                             to = in.readUTF();
                             status = in.readByte();
-                            serverListener.userFriendStatus(from, hash, to, status);
+                            serverListener.userFriendStatus(from, to, status);
                             break;
                         case 'G':
                             username = in.readUTF();
-                            hash = in.readUTF();
                             ip = in.readUTF();
-                            serverListener.IP(username, hash, ip);
+                            serverListener.IP(username, ip);
                             break;
                         case 'E':
                             error = in.readUTF();
                             serverListener.error(error);
                             break;
+                        case 'S':
+                            from = in.readUTF();
+                            to = in.readUTF();
+                            serverListener.initConversation(from,to);
+                            break;
                         case 'R':
                             username = in.readUTF();
                             status = in.readByte();
-                            serverListener.friendRequestResponse(username,status);
-                            break;
+                            serverListener.createAccountResponse(username, status);
                         default:
                             System.err.println ("Bad message");
                             break;

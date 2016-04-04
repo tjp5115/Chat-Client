@@ -47,18 +47,6 @@ public interface ServerListener {
     public void error(String error) throws IOException;
 
     /**
-     * returns the response to made by a user for a friend request
-     * @param user - user name who responded
-     * @param status - status given user selected.
-     *  1 - accepted friend request
-     *  0 - reject friend request
-     * @throws IOException
-     */
-    public void friendRequestResponse(String user, int status) throws IOException;
-
-
-
-    /**
      * initiate a conversation between two clients
      * @param from - initiator
      * @param to - responder

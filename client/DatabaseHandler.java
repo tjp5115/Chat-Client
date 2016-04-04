@@ -22,7 +22,7 @@ makes the nessitary SQL calls to the database.
 public class DatabaseHandler{
 
     Connection conn;
-
+    private boolean isConnected = false;
 
     /*Default constructor
     @parm: String - path to database file
@@ -36,6 +36,7 @@ public class DatabaseHandler{
 
             //creates the connection
             conn = DriverManager.getConnection("jdbc:h2:" + path, user, password);
+            isConnected = true;
         }//end try
         catch (SQLException | ClassNotFoundException e) {
             System.out.println("error creating the conn for database");
@@ -166,5 +167,40 @@ public class DatabaseHandler{
 	public String getName(){
 		return new String();
 	}//end
+
+    /**
+     * get the hash of the user
+     * @return hash
+     */
+    //todo
+    public String getHash(){return "";}
+
+    /**
+     * update friend up
+     * @param username - username of friend
+     * @param ip - ip of friend;
+     */
+    //todo
+    public void updateFriendIP(String username, String ip){
+
+    }
+
+    /**
+     * Gets the IP of a user
+     * @param username
+     * @return
+     */
+    //todo
+    public String getFriendIP(String username){
+        return "";
+    }
+
+    /**
+     * Need to know if the database was successfully found and read in. if not return false.
+     * @return
+     */
+    public boolean isConnected(){
+        return isConnected;
+    }
 
 }//end class

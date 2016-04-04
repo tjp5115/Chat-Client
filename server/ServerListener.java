@@ -25,7 +25,6 @@ public interface ServerListener {
     /**
      * request for a friend from a given user.
      * @param from - requester user.
-     * @param from_hash - hash to verify from.
      * @param to - requested user.
      * @param status - status of the friend request.
      * @throws IOException
@@ -35,7 +34,6 @@ public interface ServerListener {
     /**
      * return the IP of a user
      * @param user - user to the IP
-     * @param user_hash -hash to verify from.
      * @param IP - IP address of the user.
      * @throws IOException
      */
@@ -63,7 +61,6 @@ public interface ServerListener {
     /**
      * initiate a conversation between two clients
      * @param from - initiator
-     * @param from_hash -hash to verify from.
      * @param to - responder
      * @throws IOException
      */

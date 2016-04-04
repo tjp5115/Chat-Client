@@ -73,7 +73,6 @@ public class ToClient implements ServerListener{
     /**
      * request for a friend from a given user.
      * @param from - requestee
-	 * @param from_hash - Verify user.
      * @param to - requested.
      * @param status - status of the friend request.
      * @throws IOException
@@ -90,7 +89,6 @@ public class ToClient implements ServerListener{
     /**
      * return the IP of a user
      * @param user - user name of the IP
-	 * @param user_hash - Verify user.
      * @param IP - IP address of the user.
      * @throws IOException
      */
