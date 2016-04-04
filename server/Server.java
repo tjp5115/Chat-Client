@@ -22,14 +22,30 @@ class Server
 	public static void main(String args[]) throws Exception
 	{
 		if(args.length != 2) useage();
-		String host = args[0];
-		int port = Integer.parseInt(args[1]);
+		String host = "";
+		int port = 5432; //port is 5432
+
+		//get host address
+		try
+		{
+			Inet4Address address = (Inet4Address) Inet4Address.getByName("localhost");
+			host = address.getHostName();
+		}
+		catch(UnknownHostException e)
+		{
+			e.printStackTrace();
+		}
 
 		//create database handler and manager
 		DatabaseHandler db = new DatabaseHandler();
 		Manager manager = new Manager(host, port);
 		manager.setDatabaseHandler(db);
-		db.setManager(manager);
 		manager.run();
+	}
+
+	private static void usage()
+	{
+		System.err.println("Usage: java Server <host_address> <port>");
+		throw new IllegalArgumentException();
 	}
 }

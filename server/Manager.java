@@ -28,13 +28,6 @@ class Manager
 	private ArrayList<ToClient> clientList;
 	private String host;
 	private int port;
-	private final String KEY_FILE_NAME = "";
-
-	//the password used to check the integrity of the keystore, the password used to unlock the keystore
-	private final char[] UNLOCK_KEYSTORE_PASSWORD = "";
-
-	//the password for recovering keys in the keyStore
-	private final char[] GET_PRIVATE_KEY_PASSWORD = "";
 
 	public Manager(String host, int port)
 	{
@@ -48,11 +41,6 @@ class Manager
 		dbHandler = dh;
 	}
 
-	public ToClient createConnection()
-	{
-
-	}
-
 	// Listening for the initial connection
 	public void run()
 	{
@@ -60,14 +48,7 @@ class Manager
 		//prepare private key and public key
 		try
 		{
-			KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-			ks.load(new FileInputStream(KEY_FILE_NAME), UNLOCK_KEYSTORE_PASSWORD);
-
-			KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-			kmf.init(ks, GET_PRIVATE_KEY_PASSWORD);
-			SSLContext sc = SSLContext.getInstance("SSL");
-			sc.init(kmf.getKeyManagers(), null, null);
-			SSLServerSocketFactory ssf = sc.getServerSocketFactory();
+			SSLServerSocketFactory ssf = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
 			SSLServerSocket serverSocket = (SSLServerSocket) ssf.createServerSocket(port);
 
 			for(;;)

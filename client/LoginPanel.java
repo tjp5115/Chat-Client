@@ -22,10 +22,10 @@ import java.awt.event.ActionListener;
 */
 public class LoginPanel extends JPanel {
 
-    JButton newUser, loginButton, filePathButton;
-    JLabel  passwordLabel;
-    JTextField databaseText;
-    JPasswordField passwordText;
+    private JButton newUser, loginButton, filePathButton;
+    private JLabel  passwordLabel;
+    private JTextField databaseText;
+    private JPasswordField passwordText;
     private ChatFrame chatFrame;
 
     LoginPanel(ChatFrame cf){
@@ -79,6 +79,21 @@ public class LoginPanel extends JPanel {
             }
         });
         add(newUser);
+    }
+
+    public void message(String from, String to, String msg) throws IOException
+    {
+
+    }
+
+    public void start(String user) throws IOException
+    {
+
+    }
+
+    public void stop(String user) throws IOException
+    {
+        
     }
 
 }

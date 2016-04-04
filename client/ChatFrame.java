@@ -19,15 +19,25 @@ import java.awt.*;
 @emails: stl7199@rit.edu, tjp5115@rit.edu, lxl3375@rit.edu
 
 */
-public class ChatFrame {
+public class ChatFrame implements ServerListener, PeerListener
+{
     LoginPanel loginPanel;
     RegisterPanel registerPanel;
+    ClientListener clientListner;
+
     private JFrame frame;
-    ChatFrame(){
+    ChatFrame()
+    {
         createLoginFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
+
+    public void setClientListener(ClientListener listener)
+    {
+        this.clientListner = listener;
+    }
+
     public void createLoginFrame(){
         frame = new JFrame("Chat Client Login");
         frame.setSize(400, 200);
