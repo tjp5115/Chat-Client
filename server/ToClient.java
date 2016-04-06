@@ -132,7 +132,7 @@ public class ToClient implements ServerListener{
 	 * @param to - responder
      * @throws IOException
      */
-    public void initConversation(String from, String to) throws IOException{
+    public void initConversation(String from, String to, String port) throws IOException{
 		out.writeByte ('S');
 		out.writeUTF(from);
 		//out.writeUTF(from_hash);
@@ -203,7 +203,8 @@ public class ToClient implements ServerListener{
 							from = in.readUTF();
 							hash = in.readUTF();
 							to = in.readUTF();
-							clientListener.initConversation(from, hash, to);
+							String port = in.readUTF();
+							clientListener.initConversation(from, hash, to, port);
 							break;
 						case 'G':
 							from = in.readUTF();

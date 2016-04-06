@@ -93,9 +93,10 @@ public interface ClientListener {
      * @param from - initiator
      * @param from_hash - hash to verify user.
      * @param to - responder
+     * @param port - port.
      * @throws IOException
      */
-    public void initConversation(String from, String from_hash, String to) throws IOException;
+    public void initConversation(String from, String from_hash, String to, String port) throws IOException;
 
     /**
      * get the ip of a user
@@ -105,5 +106,12 @@ public interface ClientListener {
      * @throws IOException
      */
     public void getIP(String from, String from_hash, String to) throws IOException;
+
+    /**
+     * reject message from the user
+     * @param from -- who rejected
+     * @param to -- to
+     */
+    public void rejectConversation(String from, String from_hash, String to);
 
 }

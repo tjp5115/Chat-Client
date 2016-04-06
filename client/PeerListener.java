@@ -40,4 +40,10 @@ public interface PeerListener {
      * @param user - user to stop the session from.
      */
     void stop(String user) throws IOException;
+
+
+    /**
+     * Closes the server.
+     */
+    void closeServer() throws IOException;
 }

@@ -64,7 +64,7 @@ public interface ServerListener {
      * @param to - responder
      * @throws IOException
      */
-    public void initConversation(String from, String to) throws IOException;
+    public void initConversation(String from, String to,String port) throws IOException;
 
     /**
      * response from server on either or not username was taken
@@ -75,5 +75,12 @@ public interface ServerListener {
      * @throws IOException
      */
     public void createAccountResponse(String user, int status) throws IOException;
+
+
+    /**
+     * a client has reject your conversation
+     * @param user - 'friend' who rejected.
+     */
+    public void rejectedConverstaion(String user);
 
 }

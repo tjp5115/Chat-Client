@@ -65,15 +65,13 @@ public class ServerConnection implements ClientListener{
     /**
      * creates an account for a user
      *
-     * @param ip
      * @param username @throws IOException
      * @param username_hash - hash to verify from.
      * @parm: String - the ip of this user
      */
     @Override
-    public void createAccount(String ip, String username, String username_hash) throws IOException {
+    public void createAccount(String username, String username_hash) throws IOException {
         out.writeByte('R');
-        out.writeUTF(ip);
         out.writeUTF(username);
         out.writeUTF(username_hash);
         out.flush();
@@ -118,11 +116,12 @@ public class ServerConnection implements ClientListener{
      * @throws IOException
      */
     @Override
-    public void initConversation(String from, String from_hash, String to) throws IOException {
+    public void initConversation(String from, String from_hash, String to, String port) throws IOException {
         out.writeByte('S');
         out.writeUTF(from);
         out.writeUTF(from_hash);
         out.writeUTF(to);
+        out.writeUTF(port);
         out.flush();
     }
 
@@ -137,6 +136,21 @@ public class ServerConnection implements ClientListener{
     @Override
     public void getIP(String from, String from_hash, String to) throws IOException {
         out.writeByte('G');
+        out.writeUTF(from);
+        out.writeUTF(from_hash);
+        out.writeUTF(to);
+        out.flush();
+    }
+
+    /**
+     * reject message from the user
+     *
+     * @param from      -- who rejected
+     * @param from_hash
+     * @param to        -- to
+     */
+    @Override
+    public void rejectConversation(String from, String from_hash, String to) throws IOException{
         out.writeUTF(from);
         out.writeUTF(from_hash);
         out.writeUTF(to);
@@ -183,15 +197,17 @@ public class ServerConnection implements ClientListener{
                         case 'S':
                             from = in.readUTF();
                             to = in.readUTF();
-                            serverListener.initConversation(from,to);
+                            String port = in.readUTF();
+                            serverListener.initConversation(from,to, port);
                             break;
                         case 'R':
                             username = in.readUTF();
                             status = in.readByte();
                             serverListener.createAccountResponse(username, status);
                             break;
-                        case 'C':
-                            //acceptance message
+                        case 'Z':
+                            from = in.readUTF();
+                            serverListener.rejectedConverstaion(from);
                             break;
                         default:
                             System.err.println ("Bad message");

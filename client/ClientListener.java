@@ -38,12 +38,11 @@ public interface ClientListener {
 
     /**
      * creates an account for a user
-     * @param ip - the ip of this user
      * @param username
      * @param username_hash - hash to verify user.
      * @throws IOException
      */
-    public void createAccount(String ip, String username, String username_hash) throws IOException;
+    public void createAccount(String username, String username_hash) throws IOException;
 
     /**
      * log on trigger
@@ -68,7 +67,7 @@ public interface ClientListener {
      * @param to - responder
      * @throws IOException
      */
-    public void initConversation(String from, String from_hash, String to) throws IOException;
+    public void initConversation(String from, String from_hash, String to, String port) throws IOException;
 
     /**
      * get the ip of a user
@@ -79,4 +78,10 @@ public interface ClientListener {
      */
     public void getIP(String from, String from_hash, String to) throws IOException;
 
+    /**
+     * reject message from the user
+     * @param from -- who rejected
+     * @param to -- to
+     */
+    public void rejectConversation(String from, String from_hash, String to) throws IOException;
 }

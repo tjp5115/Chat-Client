@@ -10,6 +10,7 @@
 
 //imports go here
 
+import javax.net.ssl.SSLServerSocket;
 import javax.swing.*;
 import javax.xml.crypto.Data;
 import java.awt.*;
@@ -185,8 +186,7 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
      */
     public void registerUsername() {
         try {
-            clientListener.createAccount(manager.getUserIP(),
-                    registerPanel.getUsername(),
+            clientListener.createAccount(registerPanel.getUsername(),
                     //todo the digest needs to be different
                     Arrays.toString(md.digest((registerPanel.getUsername() + registerPanel.getPassword()).getBytes())));
         } catch (IOException e) {
@@ -241,6 +241,14 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
         clearChatFrame(user);
     }
 
+    /**
+     * Closes the server.
+     */
+    @Override
+    public void closeServer() throws IOException {
+
+    }
+
 
     //begin of the ClientListener Interface
 
@@ -280,9 +288,10 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
     public void IP(String user, String IP) throws IOException {
         // we have the IP, now it is time to initialize the connection.
         dbHandler.updateFriendIP(user, IP);
-        //todo appending port for the server.
-        clientListener.initConversation(dbHandler.getName(), dbHandler.getHash(), user);
-
+        //todo get the socket from the manager.
+        SSLServerSocket sslss = manager.createClientServerConnection();
+        clientListener.initConversation(dbHandler.getName(), dbHandler.getHash(), user, sslss.getLocalPort() +"");
+        peerListener.put(user,manager.createClientConnection(sslss));
     }
 
     /**
@@ -304,7 +313,7 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
      * @throws IOException
      */
     @Override
-    public void initConversation(String from, String to) throws IOException {
+    public void initConversation(String from, String to, String port) throws IOException {
         if(!dbHandler.isFriend(from)) return;
         int dialogButton = JOptionPane.YES_NO_OPTION;
         int dialogResult = JOptionPane.showConfirmDialog(null, "Do you want to start a conversation with " + from,
@@ -312,7 +321,7 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
                 dialogButton);
         if(dialogResult == 0) {
             //yes
-            peerListener.put(from, manager.createClientConnection(dbHandler.getFriendIP(from)));
+            peerListener.put(from, manager.createClientConnection(dbHandler.getFriendIP(from), port));
             start(from);
         }
     }
@@ -337,6 +346,16 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
             JOptionPane.showMessageDialog(null, "Username is taken, select a new one.",
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
+    }
+
+    /**
+     * a client has reject your conversation
+     *
+     * @param user - 'friend' who rejected.
+     */
+    @Override
+    public void rejectedConverstaion(String user) throws IOException {
+        peerListener.get(user).closeServer();
     }
 
     //start of WindowListener interface

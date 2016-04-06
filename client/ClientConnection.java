@@ -32,13 +32,13 @@ public class ClientConnection implements PeerListener{
 
     /**
      * constructor for the server connection
-     * @param _sok - SSL socket
-     * @param _peerListener - database reference.
+     * @param sok - SSL socket
+     * @param peerListener - database reference.
      * @throws IOException
      */
-    public ClientConnection(SSLSocket _sok, PeerListener peerListener) throws IOException
+    public ClientConnection(SSLSocket sok, PeerListener peerListener) throws IOException
     {
-        sok = _sok;
+        this.sok = sok;
         out = new DataOutputStream (sok.getOutputStream());
         in = new DataInputStream (sok.getInputStream());
         this.peerListener = peerListener;
@@ -100,6 +100,14 @@ public class ClientConnection implements PeerListener{
         out.writeByte('Q');
         out.writeUTF(user);
         out.flush();
+    }
+
+    /**
+     * Closes the server.
+     */
+    @Override
+    public void closeServer() throws IOException {
+        ssok.close();
     }
 
     /**
