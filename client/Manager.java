@@ -54,7 +54,7 @@ class Manager
 	{
 		//create SSL Socket to other ip
 		SSLSocketFactory sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
-		ClientConnection peer = null;
+		PeerListener peer = null;
 
 		try
 		{
@@ -63,7 +63,6 @@ class Manager
 		}catch (IOException ioe)
 		{
 			System.err.println("IOException caught. Exiting");
-			System.exit(1);
 		}
 		catch(NumberFormatException e)
 		{
@@ -79,15 +78,12 @@ class Manager
 	 */
 	public PeerListener createClientServerConnection()
 	{
-		PeerListener peer;
+		SSLServerSocketFactory ssf = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
+		PeerListener peer = null;
 		try
 		{
-			SSLServerSocketFactory ssf = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
 			SSLServerSocket serverSocket = (SSLServerSocket) ssf.createServerSocket(port);
-
-			//create ToClient object and gives it the SSL socket
 			peer = new ClientConnection(serverSocket, GUI);
-			peerList.add(peer);
 		}
 		catch(Exception e)
 		{
