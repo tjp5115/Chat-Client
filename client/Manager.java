@@ -40,9 +40,10 @@ class Manager
 	 * get ip of the user
 	 * @return ip;
 	 */
-	public String getIP(){
+	public String getServerIP(){
 		return "";
 	}
+	public String getUserIP(){return "";}
 	/**
 	 * set up the peer connection between two clients. Assumes the establishment process has been completed.
 	 * @param ip
