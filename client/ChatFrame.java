@@ -52,8 +52,8 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
         messagePanel = new HashMap<>();
         peerListener = new HashMap<>();
         this.manager = manager;
-        createLoginFrame();
-        //createDefaultChatFrame();
+        //createLoginFrame();
+        createDefaultChatFrame();
         frame.setVisible(true);
     }
     ChatFrame(){
@@ -280,8 +280,9 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
     public void IP(String user, String IP) throws IOException {
         // we have the IP, now it is time to initialize the connection.
         dbHandler.updateFriendIP(user, IP);
-
+        //todo appending port for the server.
         clientListener.initConversation(dbHandler.getName(), dbHandler.getHash(), user);
+
     }
 
     /**

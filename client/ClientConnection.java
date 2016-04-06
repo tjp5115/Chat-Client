@@ -10,6 +10,7 @@
 
 //imports go here
 
+import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLSocket;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -24,6 +25,7 @@ import java.io.IOException;
 public class ClientConnection implements PeerListener{
 
     private SSLSocket sok;
+    private SSLServerSocket ssok;
     private PeerListener peerListener;
     private DataOutputStream out;
     private DataInputStream in;
@@ -39,6 +41,14 @@ public class ClientConnection implements PeerListener{
         out = new DataOutputStream (sok.getOutputStream());
         in = new DataInputStream (sok.getInputStream());
         peerListener = _peerListener;
+        new ReaderThread().start();
+    }
+
+    public ClientConnection(SSLServerSocket ssok, PeerListener peerListener) throws IOException{
+        SSLSocket sok  = (SSLSocket)(ssok.accept());
+        out = new DataOutputStream (sok.getOutputStream());
+        in = new DataInputStream (sok.getInputStream());
+        this.peerListener = peerListener;
         new ReaderThread().start();
     }
 

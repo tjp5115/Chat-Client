@@ -189,6 +189,10 @@ public class ServerConnection implements ClientListener{
                             username = in.readUTF();
                             status = in.readByte();
                             serverListener.createAccountResponse(username, status);
+                            break;
+                        case 'C':
+                            //acceptance message
+                            break;
                         default:
                             System.err.println ("Bad message");
                             break;
