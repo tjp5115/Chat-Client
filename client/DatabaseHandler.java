@@ -9,6 +9,7 @@
 */
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.sql.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -26,6 +27,7 @@ public class DatabaseHandler{
     Connection conn;
     private boolean isConnected = false;
     String hash;
+    HashMap<String,String> map;
 
     /*Default constructor
     @parm: String - path to database file
@@ -42,6 +44,7 @@ public class DatabaseHandler{
             isConnected = true;
             MessageDigest md = MessageDigest.getInstance("SHA-256");
         	hash = String.format("%02X", md.digest(password.getBytes()));
+        	map = new HashMap<String,String>();
         }//end try
         catch (SQLException | ClassNotFoundException e) {
             System.out.println("error creating the conn for database");
@@ -216,9 +219,9 @@ public class DatabaseHandler{
      * @param username - username of friend
      * @param ip - ip of friend;
      */
-    //todo
     public void updateFriendIP(String username, String ip){
-
+		map.remove(username);
+		map.put(username, ip);
     }
 
     /**
@@ -228,8 +231,27 @@ public class DatabaseHandler{
      */
     //todo
     public String getFriendIP(String username){
-        return "";
+        return map.get(username);
     }
+
+    /**
+     * update friend up
+     * @param username - username of friend
+     * @param ip - ip of friend;
+     */
+    public void addFriendIP(String username, String ip){
+		map.put(username,ip);
+    }
+
+    /**
+     * Gets the IP of a user
+     * @param username
+     *
+     */
+    public void removeFriendIP(String username){
+        map.remove(username);
+    }
+
 
     /**
      * Need to know if the database was successfully found and read in. if not return false.
