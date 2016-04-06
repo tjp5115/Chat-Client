@@ -28,8 +28,6 @@ class Manager
 	private String SERVER_HOST;
 	private ServerConnection serverConnection;
 	private ClientConnection clientConnection;
-	private ArrayList<ClientConnection> clientConnectionList;
-	//port 0 for peer to peer
 
 	public Manager(ChatFrame inGUI)
 	{
@@ -45,6 +43,7 @@ class Manager
 		return "";
 	}
 	public String getUserIP(){return "";}
+
 	/**
 	 * set up the peer connection between two clients. Assumes the establishment process has been completed.
 	 * @param ip
@@ -60,10 +59,7 @@ class Manager
 		try
 		{
 			SSLSocket c = (SSLSocket) sf.createSocket(_ip, Integer.parseInt(_port));
-			clientConnection = new ClientConnection(c);
-			peer = new ClientConnection(c);
-			peer.setPeerListener(c);
-			setPeerListener
+			peer = new ClientConnection(c, GUI);
 		}catch (IOException ioe)
 		{
 			System.err.println("IOException caught. Exiting");
@@ -73,7 +69,32 @@ class Manager
 		{
 			System.err.println("NumberFormatException caught. Exiting");
 		}
-		return null;
+		return peer;
+	}
+
+	/**
+	 * set up the peer connection between two clients. Assumes the establishment process has been completed.
+	 * @param ip
+	 * @return
+	 */
+	public PeerListener createClientServerConnection()
+	{
+		PeerListener peer;
+		try
+		{
+			SSLServerSocketFactory ssf = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
+			SSLServerSocket serverSocket = (SSLServerSocket) ssf.createServerSocket(port);
+
+			//create ToClient object and gives it the SSL socket
+			peer = new ClientConnection(serverSocket, GUI);
+			peerList.add(peer);
+		}
+		catch(Exception e)
+		{
+			System.err.println("Exception caught");
+		}
+
+		return peer;
 	}
 
 	//send initial message to Server when the program start
