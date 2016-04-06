@@ -39,10 +39,15 @@ class Manager
 	 * get ip of the user
 	 * @return ip;
 	 */
-	public String getServerIP(){
+	public String getServerIP()
+	{
 		return "";
 	}
-	public String getUserIP(){return "";}
+	
+	public String getUserIP()
+	{
+		return "";
+	}
 
 	/**
 	 * set up the peer connection between two clients. Assumes the establishment process has been completed.
@@ -76,21 +81,25 @@ class Manager
 	 * @param ip
 	 * @return
 	 */
-	public PeerListener createClientServerConnection()
+	public SSLServerSocket createClientServerConnection()
 	{
 		SSLServerSocketFactory ssf = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
-		PeerListener peer = null;
+		SSLServerSocket serverSocket = null;
 		try
 		{
-			SSLServerSocket serverSocket = (SSLServerSocket) ssf.createServerSocket(port);
-			peer = new ClientConnection(serverSocket, GUI);
+			serverSocket = (SSLServerSocket) ssf.createServerSocket(0);
 		}
 		catch(Exception e)
 		{
 			System.err.println("Exception caught");
 		}
 
-		return peer;
+		return serverSocket;
+	}
+
+	public PeerListener createClientConnection(SSLServerSocket ssk)
+	{
+		return new ClientConnection(ssk, GUI);
 	}
 
 	//send initial message to Server when the program start
