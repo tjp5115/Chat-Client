@@ -36,11 +36,10 @@ public class ClientConnection implements PeerListener{
      * @param _peerListener - database reference.
      * @throws IOException
      */
-    public ClientConnection(SSLSocket _sok, PeerListener _peerListener) throws IOException{
+    public ClientConnection(SSLSocket _sok) throws IOException{
         sok = _sok;
         out = new DataOutputStream (sok.getOutputStream());
         in = new DataInputStream (sok.getInputStream());
-        peerListener = _peerListener;
         new ReaderThread().start();
     }
 
@@ -50,6 +49,15 @@ public class ClientConnection implements PeerListener{
         in = new DataInputStream (sok.getInputStream());
         this.peerListener = peerListener;
         new ReaderThread().start();
+    }
+
+    /**
+     * set the peer client to the client connection
+     * @param _peerListener - peer listener
+     */
+    public void setPeerListener(PeerListener _peerListener)
+    {
+        peerListener = _peerListener;
     }
 
     /**
