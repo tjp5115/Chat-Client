@@ -10,6 +10,8 @@
 
 import java.util.ArrayList;
 import java.sql.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /* This class handles all requests from the clients, it also
 makes the nessitary SQL calls to the database.
@@ -23,6 +25,7 @@ public class DatabaseHandler{
 
     Connection conn;
     private boolean isConnected = false;
+    String hash;
 
     /*Default constructor
     @parm: String - path to database file
@@ -37,11 +40,18 @@ public class DatabaseHandler{
             //creates the connection
             conn = DriverManager.getConnection("jdbc:h2:" + path, user, password);
             isConnected = true;
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+        	hash = String.format("%02X", md.digest(password.getBytes()));
         }//end try
         catch (SQLException | ClassNotFoundException e) {
             System.out.println("error creating the conn for database");
             e.printStackTrace();
         }//end catch
+        catch (NoSuchAlgorithmException e){
+			System.out.println("error creating the conn for database: HASH error");
+            e.printStackTrace();
+		}//end catch
+
     }//end constructor
 
 
@@ -155,7 +165,19 @@ public class DatabaseHandler{
 
 	*/
 	public String getServerIP(){
-		return new String();
+		String ans = "";
+		try{
+			Statement stmt = conn.createStatement();
+			ResultSet s = stmt.executeQuery("SELECT serverIP FROM username");
+			while(s.next()){
+				ans = s.getString(1);
+			}//end
+		}//end try
+        catch(SQLException e){
+            System.out.println("error getServerIP");
+            e.printStackTrace();
+        }//end catch
+        return ans;
 	}//end
 
 
@@ -165,7 +187,19 @@ public class DatabaseHandler{
 
 	*/
 	public String getName(){
-		return new String();
+		String ans = "";
+		try{
+			Statement stmt = conn.createStatement();
+			ResultSet s = stmt.executeQuery("SELECT user FROM username");
+			while(s.next()){
+				ans = s.getString(1);
+			}//end
+		}//end try
+        catch(SQLException e){
+            System.out.println("error getName");
+            e.printStackTrace();
+        }//end catch
+        return ans;
 	}//end
 
     /**
@@ -173,7 +207,9 @@ public class DatabaseHandler{
      * @return hash
      */
     //todo
-    public String getHash(){return "";}
+    public String getHash(){
+		return hash;
+	}//end get
 
     /**
      * update friend up
