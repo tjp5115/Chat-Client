@@ -18,6 +18,7 @@ import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -39,6 +40,7 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
     private MessagePanel currentMessagePanel;
     private JFrame frame;
     private Manager manager;
+    private Dimension messageDim;
     MessageDigest md;
     ChatFrame(Manager manager)
     {
@@ -51,7 +53,11 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
         peerListener = new HashMap<>();
         this.manager = manager;
         createLoginFrame();
+        //createDefaultChatFrame();
         frame.setVisible(true);
+    }
+    ChatFrame(){
+        this(null);
     }
 
     //setter
@@ -75,7 +81,7 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
      */
     public void createRegisterFrame(){
         frame.remove(loginPanel);
-        frame.setSize(400, 210);
+        frame.setSize(400, 230);
         registerPanel = new RegisterPanel(this);
         frame.add(registerPanel);
         frame.revalidate();
@@ -85,15 +91,17 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
     /**
      * creates and sets the current frame to the chat frame for the gui.
      */
-    public void createChatFrame(String user){
-        if (registerPanel == null){
+    public void createDefaultChatFrame(){
+        if (registerPanel != null){
             frame.remove(registerPanel);
-        }else{
+        }else if(loginPanel != null){
             frame.remove(loginPanel);
+        }else{
+            System.err.println("CreateDefaultChatFrame Call with no login or register panel, Hope you are debugging");
+            frame = new JFrame();
         }
 
-        if(currentMessagePanel != null)
-            currentMessagePanel.setVisible(false);
+
 
 
         frame.setTitle("Chat Client");
@@ -101,20 +109,25 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
         frame.setLayout(new BorderLayout());
         Dimension friendDim = new Dimension(200,700);
 
-        friendPanel = new FriendPanel(this, friendDim, dbHandler.getFriends());
+        //friendPanel = new FriendPanel(this, friendDim, dbHandler.getFriends());
+        friendPanel = new FriendPanel(this, friendDim, new ArrayList() );
         frame.add(friendPanel,BorderLayout.WEST);
 
-
-        currentMessagePanel =new MessagePanel(this, user);
-        messagePanel.put(user, currentMessagePanel) ;
-
-        currentMessagePanel.setPreferredSize(new Dimension(380, 700));
+        messageDim = new Dimension(380, 700);
+        currentMessagePanel = new MessagePanel(this, "Tyler", "Not Tyler",messageDim);
         frame.add(currentMessagePanel, BorderLayout.EAST);
+    }
+    public void createChatSession(String user){
+        if(currentMessagePanel != null)
+            currentMessagePanel.setVisible(false);
+
+        new MessagePanel(this, dbHandler.getName(), user, messageDim);
+        messagePanel.put(user, currentMessagePanel) ;
+        currentMessagePanel.setPreferredSize(messageDim);
 
         frame.revalidate();
         frame.repaint();
     }
-
     /**
      * removes a user from the chatframe map and panel
      * @param user
@@ -172,7 +185,7 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
      */
     public void registerUsername() {
         try {
-            clientListener.createAccount(manager.getIP(),
+            clientListener.createAccount(manager.getUserIP(),
                     registerPanel.getUsername(),
                     //todo the digest needs to be different
                     Arrays.toString(md.digest((registerPanel.getUsername() + registerPanel.getPassword()).getBytes())));
@@ -215,7 +228,7 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
      */
     @Override
     public void start(String user) throws IOException {
-        createChatFrame(user);
+        createChatSession(user);
     }
 
     /**
@@ -291,6 +304,7 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
      */
     @Override
     public void initConversation(String from, String to) throws IOException {
+        if(!dbHandler.isFriend(from)) return;
         int dialogButton = JOptionPane.YES_NO_OPTION;
         int dialogResult = JOptionPane.showConfirmDialog(null, "Do you want to start a conversation with " + from,
                 "Init chat conversation",
@@ -316,8 +330,8 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
             //todo we need some way to create the database file.
             //dbHandler = new DatabaseHandler();
             //todo Why do we need IP
-            dbHandler.init(user,"");
-            createChatFrame(user);
+            dbHandler.init(user,manager.getServerIP());
+            createDefaultChatFrame();
         } else
             JOptionPane.showMessageDialog(null, "Username is taken, select a new one.",
                     "Error",

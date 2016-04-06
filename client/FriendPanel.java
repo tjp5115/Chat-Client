@@ -83,15 +83,15 @@ public class FriendPanel extends JPanel {
     }
 
     class FriendButton extends JButton{
-        private String name;
+        private String buttonName;
         FriendButton(String name, Dimension dim){
             super(name);
-            this.name = name;
+            this.buttonName = name;
             setPreferredSize(dim);
             addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    chatFrame.setMessagePanelUser(name);
+                    chatFrame.setMessagePanelUser(buttonName);
                 }
             });
         }
