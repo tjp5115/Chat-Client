@@ -27,6 +27,7 @@ class Manager
 	private ChatFrame GUI;
 	private String SERVER_HOST;
 	private ServerConnection serverConnection;
+	private ClientConnection clientConnection;
 	private ArrayList<ClientConnection> clientConnectionList;
 	//port 0 for peer to peer
 
@@ -49,8 +50,28 @@ class Manager
 	 * @return
 	 */
 	//todo
-	public PeerListener createClientConnection(String ip)
+	public PeerListener createClientConnection(String _ip, String _port)
 	{
+		//create SSL Socket to other ip
+		SSLSocketFactory sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
+		ClientConnection peer = null;
+
+		try
+		{
+			SSLSocket c = (SSLSocket) sf.createSocket(_ip, Integer.parseInt(_port));
+			clientConnection = new ClientConnection(c);
+			peer = new ClientConnection(c);
+			peer.setPeerListener(c);
+			setPeerListener
+		}catch (IOException ioe)
+		{
+			System.err.println("IOException caught. Exiting");
+			System.exit(1);
+		}
+		catch(NumberFormatException e)
+		{
+			System.err.println("NumberFormatException caught. Exiting");
+		}
 		return null;
 	}
 
