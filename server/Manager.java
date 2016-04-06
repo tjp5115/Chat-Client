@@ -9,11 +9,11 @@
  */
 
 //imports go here
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSocket;
 import java.util.ArrayList;
 import java.io.*;
-import java.net.*;
-import java.net.ssl.*;
-import java.security.*;
 
 /* class Description
 
@@ -59,6 +59,8 @@ class Manager
 				ToClient tc = new ToClient(clientSocket, (ClientListener)dbHandler);
 				clientList.add(tc);
 			}	
+		} catch (IOException e) {
+			System.err.println("IOException in Server manager");
 		}
 	}
 }

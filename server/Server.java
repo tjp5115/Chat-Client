@@ -17,6 +17,9 @@
 
 */
 
+import java.net.Inet4Address;
+import java.net.UnknownHostException;
+
 class Server
 {
 	public static void main(String args[]) throws Exception
@@ -43,7 +46,7 @@ class Server
 		manager.run();
 	}
 
-	private static void usage()
+	private static void useage()
 	{
 		System.err.println("Usage: java Server <host_address> <port>");
 		throw new IllegalArgumentException();
