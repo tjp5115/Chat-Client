@@ -12,15 +12,11 @@
 
 import javax.net.ssl.SSLServerSocket;
 import javax.swing.*;
-import javax.xml.crypto.Data;
 import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 /* Chat frame for the GUI. Components are added to this class for each section of the frame.
@@ -42,19 +38,13 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
     private JFrame frame;
     private Manager manager;
     private Dimension messageDim;
-    MessageDigest md;
     ChatFrame(Manager manager)
     {
-        try {
-            md = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
         messagePanel = new HashMap<>();
         peerListener = new HashMap<>();
         this.manager = manager;
-        //createLoginFrame();
-        createDefaultChatFrame();
+        createLoginFrame();
+        //createDefaultChatFrame();
         frame.setVisible(true);
     }
     ChatFrame(){
@@ -187,8 +177,7 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
     public void registerUsername() {
         try {
             clientListener.createAccount(registerPanel.getUsername(),
-                    //todo the digest needs to be different
-                    Arrays.toString(md.digest((registerPanel.getUsername() + registerPanel.getPassword()).getBytes())));
+                    dbHandler.getPasswordHash(registerPanel.getPassword()));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -239,14 +228,6 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
     @Override
     public void stop(String user) throws IOException {
         clearChatFrame(user);
-    }
-
-    /**
-     * Closes the server.
-     */
-    @Override
-    public void closeServer() throws IOException {
-
     }
 
 
@@ -337,9 +318,9 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
     @Override
     public void createAccountResponse(String user, int status) throws IOException {
         if(status == 1) {
-            //todo we need some way to create the database file.
-            //dbHandler = new DatabaseHandler();
-            //todo Why do we need IP
+            dbHandler = new DatabaseHandler(registerPanel.getPath(),
+                    registerPanel.getUsername(),
+                    registerPanel.getPassword());
             dbHandler.init(user,manager.getServerIP());
             createDefaultChatFrame();
         } else
@@ -355,7 +336,7 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
      */
     @Override
     public void rejectedConverstaion(String user) throws IOException {
-        peerListener.get(user).closeServer();
+        peerListener.get(user).stop(user);
     }
 
     //start of WindowListener interface

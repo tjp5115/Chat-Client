@@ -95,4 +95,7 @@ public class RegisterPanel extends JPanel{
     public String getPassword(){
         return Arrays.toString(passwordText.getPassword());
     }
+    public String getPath(){
+        return databaseText.getText() + getUsername();
+    }
 }

@@ -42,8 +42,4 @@ public interface PeerListener {
     void stop(String user) throws IOException;
 
 
-    /**
-     * Closes the server.
-     */
-    void closeServer() throws IOException;
 }

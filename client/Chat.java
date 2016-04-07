@@ -25,13 +25,6 @@ class Chat
 		//create GUI
 		ChatFrame cf = new ChatFrame();
 
-		//create Database
-		String path = "";
-		String username ="";
-		String password = "";
-		DatabaseHandler dbHandler = new DatabaseHandler(path, username, password);
-		//connect databse to GUI
-
 		//create Manager, and pass the database and GUI to manager
 		Manager manager = new Manager(cf);
 		manager.run();

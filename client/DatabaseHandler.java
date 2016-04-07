@@ -42,19 +42,13 @@ public class DatabaseHandler{
             //creates the connection
             conn = DriverManager.getConnection("jdbc:h2:" + path + ";CIPHER=AES", user, password);
             isConnected = true;
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-        	hash = String.format("%02X", md.digest(password.getBytes()));
+        	hash = getPasswordHash(password);
         	map = new HashMap<String,String>();
         }//end try
         catch (SQLException | ClassNotFoundException e) {
             System.out.println("error creating the conn for database");
             e.printStackTrace();
         }//end catch
-        catch (NoSuchAlgorithmException e){
-			System.out.println("error creating the conn for database: HASH error");
-            e.printStackTrace();
-		}//end catch
-
     }//end constructor
 
 
@@ -259,6 +253,16 @@ public class DatabaseHandler{
      */
     public boolean isConnected(){
         return isConnected;
+    }
+    public static String getPasswordHash(String pw){
+        MessageDigest md = null;
+        try {
+            md = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println("error creating the conn for database: HASH error");
+            e.printStackTrace();
+        }
+        return String.format("%02X", md.digest(pw.getBytes()));
     }
 
 }//end class

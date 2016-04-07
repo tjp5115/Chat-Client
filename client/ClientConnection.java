@@ -97,17 +97,13 @@ public class ClientConnection implements PeerListener{
      */
     @Override
     public void stop(String user) throws IOException {
-        out.writeByte('Q');
-        out.writeUTF(user);
-        out.flush();
-    }
-
-    /**
-     * Closes the server.
-     */
-    @Override
-    public void closeServer() throws IOException {
-        ssok.close();
+        if(ssok != null){
+            ssok.close();
+        }else {
+            out.writeByte('Q');
+            out.writeUTF(user);
+            out.flush();
+        }
     }
 
     /**

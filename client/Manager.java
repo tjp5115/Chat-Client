@@ -9,6 +9,8 @@
  */
 
 //imports go here
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.*;
@@ -51,7 +53,6 @@ class Manager
 
 	/**
 	 * set up the peer connection between two clients. Assumes the establishment process has been completed.
-	 * @param ip
 	 * @return
 	 */
 	//todo
@@ -78,7 +79,6 @@ class Manager
 
 	/**
 	 * set up the peer connection between two clients. Assumes the establishment process has been completed.
-	 * @param ip
 	 * @return
 	 */
 	public SSLServerSocket createClientServerConnection()
@@ -99,7 +99,12 @@ class Manager
 
 	public PeerListener createClientConnection(SSLServerSocket ssk)
 	{
-		return new ClientConnection(ssk, GUI);
+		try {
+			return new ClientConnection(ssk, GUI);
+		} catch (IOException e) {
+			System.err.println("IOException while creating a clientConnection in the manager.");
+		}
+		return null;
 	}
 
 	//send initial message to Server when the program start
