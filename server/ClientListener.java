@@ -112,6 +112,6 @@ public interface ClientListener {
      * @param from -- who rejected
      * @param to -- to
      */
-    public void rejectConversation(String from, String from_hash, String to);
+    public void rejectConversation(String from, String from_hash, String to) throws IOException;
 
 }

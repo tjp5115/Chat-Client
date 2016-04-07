@@ -40,7 +40,7 @@ public class DatabaseHandler{
             Class.forName("org.h2.Driver");
 
             //creates the connection
-            conn = DriverManager.getConnection("jdbc:h2:" + path, user, password);
+            conn = DriverManager.getConnection("jdbc:h2:" + path + ";CIPHER=AES", user, password);
             isConnected = true;
             MessageDigest md = MessageDigest.getInstance("SHA-256");
         	hash = String.format("%02X", md.digest(password.getBytes()));

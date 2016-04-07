@@ -55,7 +55,7 @@ public class DatabaseHandler implements ClientListener{
 		try{
 			Statement stmt = conn.createStatement();
 			stmt.execute("CREATE TABLE users(USER VARCHAR(255) PRIMARY KEY, IP VARCHAR(25), ONLINE BOOLEAN, HASH VARCHAR(255));");
-			stmt.execute("CREATE TABLE messages(MESSAGE VARCHAR(255), FOREIGN KEY(USER) REFERENCES USERS);");
+			stmt.execute("CREATE TABLE messages(MESSAGE VARCHAR(255), USER VARCHAR(255), FOREIGN KEY(USER) REFERENCES USERS);");
 		}//end try
 		catch(SQLException e){
 			System.out.println("error creating tables");
@@ -182,6 +182,11 @@ public class DatabaseHandler implements ClientListener{
 				stmt.execute("UPDATE users " +
 					"SET IP=" + t.getIP() +", ONLINE=TRUE"
 					+ " WHERE USER=" + user + ";");
+
+				ResultSet s = stmt.executeQuery("SELECT MESSAGE FROM MESSAGES WHERE UESR=\'" + user + "\';");
+				while(s.next()){
+					t.userFriendStatus(s.getString(1));
+				}//end while
 			}//end try
 			catch(SQLException e){
 				System.out.println("error logon");
@@ -222,15 +227,17 @@ public class DatabaseHandler implements ClientListener{
     /**
      * initiate a conversation between two clients
      * @param from - initiator
+     * @parm from_hash - the hash from the from
      * @param to - responder
+     * @param port - port.
      * @throws IOException
      */
-    public synchronized void initConversation(String from, String from_hash, String to) throws IOException{
+    public synchronized void initConversation(String from, String from_hash, String to, String port) throws IOException{
 		if(check(from,from_hash)){
 			ToClient t = null;
 			try{
 				Statement stmt = conn.createStatement();
-				ResultSet s = stmt.executeQuery("SELECT HASH FROM USERS WHERE UESR=\'" + from + "\';");
+				ResultSet s = stmt.executeQuery("SELECT HASH FROM USERS WHERE UESR=\'" + to + "\';");
 				String test = s.getString(1);
 				t = cons.get(to.concat(test));
 			}//end try
@@ -243,7 +250,7 @@ public class DatabaseHandler implements ClientListener{
 				n.error(to + " is not online");
 			}//end if
 			else{
-				t.initConversation(from,to);
+				t.initConversation(from,to,port);
 			}//end
 		}//end if
 		else{
@@ -303,4 +310,33 @@ public class DatabaseHandler implements ClientListener{
 		}//end catch
 		return ans;
 	}//end
+
+	/**
+     * reject message from the user
+     * @param from -- who rejected
+     * @param to -- to
+     */
+    public void rejectConversation(String from, String from_hash, String to) throws IOException{
+		try{
+			if(check(from,from_hash)){
+				Statement stmt = conn.createStatement();
+				ResultSet s = stmt.executeQuery("SELECT HASH FROM USERS WHERE UESR=\'" + to + "\';");
+				String test = s.getString(1);
+				ToClient t = cons.get(to.concat(test));
+				t.rejectedConverstaion(from);
+
+			}//end if
+			else{
+				ToClient t = cons.get(from.concat(from_hash));
+				t.error("Your not authehtic!");
+			}
+		}//end try
+		catch(SQLException e){
+			System.out.println("error reject");
+			e.printStackTrace();
+		}//end catch
+
+	}//end
+
+
 }//end class

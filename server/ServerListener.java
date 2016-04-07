@@ -81,6 +81,6 @@ public interface ServerListener {
      * a client has reject your conversation
      * @param user - 'friend' who rejected.
      */
-    public void rejectedConverstaion(String user);
+    public void rejectedConverstaion(String user) throws IOException;
 
 }
