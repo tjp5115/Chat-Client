@@ -22,21 +22,21 @@ import java.io.*;
 
 */
 
-class Manager
+class ManagerServer
 {
-	private DatabaseHandler dbHandler;
+	private DatabaseHandlerServer dbHandler;
 	private ArrayList<ToClient> clientList;
 	private String host;
 	private int port;
 
-	public Manager(String host, int port)
+	public ManagerServer(String host, int port)
 	{
 		clientList = new ArrayList<ToClient>();
 		this.host = host;
 		this.port = port;
 	}
 
-	public void setDatabaseHandler(DatabaseHandler dh)
+	public void setDatabaseHandler(DatabaseHandlerServer dh)
 	{
 		dbHandler = dh;
 	}

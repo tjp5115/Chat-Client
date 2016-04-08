@@ -59,18 +59,12 @@ public interface ClientListener {
 
     /**
      * creates an account for a user
-     * @param ip - the ip of this user
+     * @param ip
      * @param username
      * @param username_hash - hash to verify user.
      * @throws IOException
      */
     public void createAccount(String ip, String username, String username_hash) throws IOException;
-
-    /**
-     * initiates a connection between two nodes
-     * @throws IOException
-     */
-    public void initConnection() throws IOException;
 
     /**
      * log on trigger

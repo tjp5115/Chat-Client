@@ -25,8 +25,8 @@ class Chat
 		//create GUI
 		ChatFrame cf = new ChatFrame();
 
-		//create Manager, and pass the database and GUI to manager
-		Manager manager = new Manager(cf);
-		manager.run();
+		//create ManagerClient, and pass the database and GUI to managerClient
+		ManagerClient managerClient = new ManagerClient(cf);
+		managerClient.run();
 	}
 }

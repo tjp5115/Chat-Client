@@ -62,16 +62,27 @@ public class ServerConnection implements ClientListener{
         out.flush();
     }
 
+    @Override
+    public void add(String name, String hash, ToClient c) {
+
+    }
+
+    @Override
+    public void add(String ip, ToClient c) {
+
+    }
+
     /**
      * creates an account for a user
-     *
+     * @param ip
      * @param username @throws IOException
      * @param username_hash - hash to verify from.
      * @parm: String - the ip of this user
      */
     @Override
-    public void createAccount(String username, String username_hash) throws IOException {
+    public void createAccount(String ip, String username, String username_hash) throws IOException {
         out.writeByte('R');
+        out.writeUTF(ip);
         out.writeUTF(username);
         out.writeUTF(username_hash);
         out.flush();

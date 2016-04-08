@@ -22,7 +22,7 @@ makes the nessitary SQL calls to the database.
 
 */
 
-public class DatabaseHandler{
+public class DatabaseHandlerClient {
 
     Connection conn;
     private boolean isConnected = false;
@@ -34,7 +34,7 @@ public class DatabaseHandler{
     @parm: String - username
     @parm: String - user password
     */
-    public DatabaseHandler(String path, String user, String password){
+    public DatabaseHandlerClient(String path, String user, String password){
         try {
             //This tells it to use the h2 driver
             Class.forName("org.h2.Driver");

@@ -9,7 +9,6 @@
  */
 
 import java.io.IOException;
-import java.net.*;
 import javax.net.ssl.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -80,7 +79,6 @@ public class ToClient implements ServerListener{
     public void userFriendStatus(String from, String to, int status) throws IOException{
 		out.writeByte ('F');
 		out.writeUTF(from);
-		//out.writeUTF(from_hash);
 		out.writeUTF(to);
 		out.writeByte(status);
 		out.flush();

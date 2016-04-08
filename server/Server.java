@@ -40,8 +40,8 @@ class Server
 		}
 
 		//create database handler and manager
-		DatabaseHandler db = new DatabaseHandler();
-		Manager manager = new Manager(host, port);
+		DatabaseHandlerServer db = new DatabaseHandlerServer();
+		ManagerServer manager = new ManagerServer(host, port);
 		manager.setDatabaseHandler(db);
 		manager.run();
 	}

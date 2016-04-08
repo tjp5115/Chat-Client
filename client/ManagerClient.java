@@ -14,7 +14,6 @@ import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.*;
-import java.util.ArrayList;
 
 /* class Description
 
@@ -24,14 +23,14 @@ import java.util.ArrayList;
 */
 
 
-class Manager
+class ManagerClient
 {
 	private ChatFrame GUI;
 	private String SERVER_HOST;
 	private ServerConnection serverConnection;
 	private ClientConnection clientConnection;
 
-	public Manager(ChatFrame inGUI)
+	public ManagerClient(ChatFrame inGUI)
 	{
 		this.GUI = inGUI;
 		this.SERVER_HOST = "";

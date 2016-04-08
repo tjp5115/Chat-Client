@@ -21,7 +21,7 @@ That is making the calls needs to add its self to this class through the add met
 
 */
 
-public class DatabaseHandler implements ClientListener{
+public class DatabaseHandlerServer implements ClientListener{
 
 	HashMap<String, ToClient> cons;
 	Connection conn;
@@ -31,7 +31,7 @@ public class DatabaseHandler implements ClientListener{
 	makes cons and conn
 
 	*/
-	public DatabaseHandler(){
+	public DatabaseHandlerServer(){
 		cons = new HashMap<String, ToClient>();
 		try {
 			//This tells it to use the h2 driver
@@ -161,13 +161,6 @@ public class DatabaseHandler implements ClientListener{
 		}//end else
 	}//end create
 
-    /**
-     * initiates a connection between two nodes
-     * @throws IOException
-     */
-    public synchronized void initConnection() throws IOException{
-		//does nothing
-	}//end init
 
     /**
      * log on trigger

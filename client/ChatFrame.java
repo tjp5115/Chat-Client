@@ -27,7 +27,7 @@ import java.util.HashMap;
 */
 public class ChatFrame implements ServerListener, PeerListener, WindowListener
 {
-    private DatabaseHandler dbHandler;
+    private DatabaseHandlerClient dbHandler;
     private LoginPanel loginPanel;
     private RegisterPanel registerPanel;
     private ClientListener clientListener;
@@ -36,13 +36,13 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
     private HashMap<String,MessagePanel> messagePanel;
     private MessagePanel currentMessagePanel;
     private JFrame frame;
-    private Manager manager;
+    private ManagerClient managerClient;
     private Dimension messageDim;
-    ChatFrame(Manager manager)
+    ChatFrame(ManagerClient managerClient)
     {
         messagePanel = new HashMap<>();
         peerListener = new HashMap<>();
-        this.manager = manager;
+        this.managerClient = managerClient;
         createLoginFrame();
         //createDefaultChatFrame();
         frame.setVisible(true);
@@ -155,7 +155,7 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
      */
     public void logon(){
         if(dbHandler == null){
-            dbHandler = new DatabaseHandler(loginPanel.getPath(), loginPanel.getUsername(), loginPanel.getPassword());
+            dbHandler = new DatabaseHandlerClient(loginPanel.getPath(), loginPanel.getUsername(), loginPanel.getPassword());
             if (!dbHandler.isConnected()){
                 JOptionPane.showMessageDialog(null,
                         "Error connecting to database, Check filepath.",
@@ -176,7 +176,8 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
      */
     public void registerUsername() {
         try {
-            clientListener.createAccount(registerPanel.getUsername(),
+            clientListener.createAccount(managerClient.getUserIP(),
+                    registerPanel.getUsername(),
                     dbHandler.getPasswordHash(registerPanel.getPassword()));
         } catch (IOException e) {
             e.printStackTrace();
@@ -269,10 +270,10 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
     public void IP(String user, String IP) throws IOException {
         // we have the IP, now it is time to initialize the connection.
         dbHandler.updateFriendIP(user, IP);
-        //todo get the socket from the manager.
-        SSLServerSocket sslss = manager.createClientServerConnection();
+        //todo get the socket from the managerClient.
+        SSLServerSocket sslss = managerClient.createClientServerConnection();
         clientListener.initConversation(dbHandler.getName(), dbHandler.getHash(), user, sslss.getLocalPort() +"");
-        peerListener.put(user,manager.createClientConnection(sslss));
+        peerListener.put(user, managerClient.createClientConnection(sslss));
     }
 
     /**
@@ -302,7 +303,7 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
                 dialogButton);
         if(dialogResult == 0) {
             //yes
-            peerListener.put(from, manager.createClientConnection(dbHandler.getFriendIP(from), port));
+            peerListener.put(from, managerClient.createClientConnection(dbHandler.getFriendIP(from), port));
             start(from);
         }
     }
@@ -318,10 +319,10 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
     @Override
     public void createAccountResponse(String user, int status) throws IOException {
         if(status == 1) {
-            dbHandler = new DatabaseHandler(registerPanel.getPath(),
+            dbHandler = new DatabaseHandlerClient(registerPanel.getPath(),
                     registerPanel.getUsername(),
                     registerPanel.getPassword());
-            dbHandler.init(user,manager.getServerIP());
+            dbHandler.init(user, managerClient.getServerIP());
             createDefaultChatFrame();
         } else
             JOptionPane.showMessageDialog(null, "Username is taken, select a new one.",
