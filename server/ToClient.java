@@ -9,9 +9,9 @@
  */
 
 import java.io.IOException;
-import javax.net.ssl.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.net.Socket;
 
 /* class Description
 
@@ -22,7 +22,7 @@ import java.io.DataOutputStream;
 
 public class ToClient implements ServerListener{
 
-	private SSLSocket sok;
+	private Socket sok;
 	private ClientListener clientListener;
 	private DataOutputStream out;
 	private DataInputStream in;
@@ -30,15 +30,15 @@ public class ToClient implements ServerListener{
 
 	/**
 	 *  Constructor for the ToClient connection
-	 * @param _sok - SSL socket
-	 * @param _clientListener - database reference;
+	 * @param sok - SSL socket
+	 * @param clientListener - database reference;
 	 * @throws IOException
 	 */
-	ToClient(SSLSocket _sok, ClientListener _clientListener) throws IOException{
-		sok = _sok;
+	ToClient(Socket sok, ClientListener clientListener) throws IOException{
+		this.sok = sok;
 		out = new DataOutputStream (sok.getOutputStream());
 		in = new DataInputStream (sok.getInputStream());
-		clientListener = _clientListener;
+		this.clientListener = clientListener;
 		toc = this;
 		new ReaderThread().start();
 	}
@@ -46,7 +46,7 @@ public class ToClient implements ServerListener{
 	/*this method returns the ssl socket of the toclient
 	@post: sslsocket- the connection
 	*/
-	public SSLSocket getSok(){
+	public Socket getSok(){
 		return sok;
 	}//end
 
@@ -55,7 +55,11 @@ public class ToClient implements ServerListener{
 
     */
     public String getIP(){
-		return sok.getInetAddress().toString();
+		byte []addr = sok.getInetAddress().getAddress();
+		StringBuffer out = new StringBuffer();
+		for(int i = 0; i < addr.length; ++i)
+			out.append(addr[i]+".");
+		return out.substring(0, out.length() - 1);
 	}//end
 
 	/*overrides equals
@@ -90,7 +94,7 @@ public class ToClient implements ServerListener{
 
 	*/
 	public void userFriendStatus(String message)throws IOException{
-		out.writeByte ('F');
+		out.writeByte('F');
 		out.writeUTF(message);
 		out.flush();
 	}
@@ -115,7 +119,7 @@ public class ToClient implements ServerListener{
      * @throws IOException
      */
     public void error(String error) throws IOException{
-		out.writeByte ('E');
+		out.writeByte('E');
 		out.writeUTF(error);
 		out.flush();
 	}//end error
@@ -166,7 +170,7 @@ public class ToClient implements ServerListener{
      * @param user - 'friend' who rejected.
      */
     public void rejectedConverstaion(String user) throws IOException{
-		out.writeByte ('Z');
+		out.writeByte('Z');
 		out.writeUTF(user);
 		out.flush();
 	}
@@ -207,7 +211,8 @@ public class ToClient implements ServerListener{
 							ip = in.readUTF();
 							username = in.readUTF();
 							hash = in.readUTF();
-							clientListener.add(getIP(), toc);
+							System.out.println(ip + " " + username + " " + hash );
+							clientListener.add(ip, toc);
 							clientListener.createAccount(ip, username, hash);
 							break;
 						case 'J':

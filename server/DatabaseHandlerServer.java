@@ -132,11 +132,17 @@ public class DatabaseHandlerServer implements ClientListener{
 		//check to see if username is already used
 		try{
 			Statement stmt = conn.createStatement();
-			ResultSet s = stmt.executeQuery("SELECT USER FROM USERS WHERE UESR=\'" + username + "\';");
+			ResultSet s = stmt.executeQuery("SELECT USER FROM USERS WHERE USER=\'" + username + "\';");
+			if(!s.next()){
+				c = true;
+			}
+			/*
+			//always threw an error: Error: No data available.
 			String test = s.getString(1);
 			if(test == null){
-			 c = true;
+				c = true;
 			}//end if
+			*/
 		}//end try
 		catch(SQLException e){
 			System.out.println("error checking if username is taken");
@@ -146,7 +152,8 @@ public class DatabaseHandlerServer implements ClientListener{
 			//adding user
 			try{
 				Statement stmt = conn.createStatement();
-				stmt.execute("INSERT INTO users VALUES(\"" + username + "\",\"" + ip + "\",TRUE, \'" + username_hash + "\');");
+				String sql = "INSERT INTO users VALUES('"+username+"', '"+ip+"', TRUE, '" + username_hash + "');";
+				stmt.execute(sql);
 			}//end try
 			catch(SQLException e){
 				System.out.println("error createaccount");

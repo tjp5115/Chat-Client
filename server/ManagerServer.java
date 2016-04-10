@@ -9,10 +9,9 @@
  */
 
 //imports go here
-import javax.net.ssl.SSLServerSocket;
-import javax.net.ssl.SSLServerSocketFactory;
-import javax.net.ssl.SSLSocket;
-import java.util.ArrayList;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.io.*;
 
 /* class Description
@@ -25,13 +24,13 @@ import java.io.*;
 class ManagerServer
 {
 	private DatabaseHandlerServer dbHandler;
-	private ArrayList<ToClient> clientList;
 	private int port;
+	private String host;
 
-	public ManagerServer(int port)
+	public ManagerServer(String host, int port)
 	{
-		clientList = new ArrayList<ToClient>();
 		this.port = port;
+		this.host = host;
 	}
 
 	public void setDatabaseHandler(DatabaseHandlerServer dh)
@@ -46,18 +45,18 @@ class ManagerServer
 		//prepare private key and public key
 		try
 		{
-			SSLServerSocketFactory ssf = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
-			SSLServerSocket serverSocket = (SSLServerSocket) ssf.createServerSocket(port);
+			ServerSocket serverSocket = new ServerSocket();
+			serverSocket.bind (new InetSocketAddress (host, port));
 			System.out.println(serverSocket.getInetAddress().toString());
 
 			for(;;)
 			{
 				//receive any SSLsocket
-				SSLSocket clientSocket = (SSLSocket) serverSocket.accept();
+				Socket clientSocket = serverSocket.accept();
+				System.out.println("Accepted.");
 				//create ToClient object and gives it the SSL socket
-				ToClient tc = new ToClient(clientSocket, (ClientListener)dbHandler);
-				clientList.add(tc);
-			}	
+				new ToClient(clientSocket, dbHandler);
+			}
 		} catch (IOException e) {
 			System.err.println("IOException in Server manager");
 		}

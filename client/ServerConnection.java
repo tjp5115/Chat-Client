@@ -9,10 +9,10 @@
 */
 
 //imports go here
-import javax.net.ssl.SSLSocket;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.Socket;
 
 /* Client connection to the server.
 
@@ -22,7 +22,8 @@ import java.io.IOException;
 */
 public class ServerConnection implements ClientListener{
 
-    private SSLSocket sok;
+    //private SSLSocket sok;
+    private Socket sok;
     private ServerListener serverListener;
     private DataOutputStream out;
     private DataInputStream in;
@@ -33,7 +34,7 @@ public class ServerConnection implements ClientListener{
      * @param _serverListener - database reference.
      * @throws IOException
      */
-    public ServerConnection(SSLSocket _sok, ServerListener _serverListener)throws IOException{
+    public ServerConnection(Socket _sok, ServerListener _serverListener)throws IOException{
         sok = _sok;
         out = new DataOutputStream (sok.getOutputStream());
         in = new DataInputStream (sok.getInputStream());
@@ -81,6 +82,7 @@ public class ServerConnection implements ClientListener{
      */
     @Override
     public void createAccount(String ip, String username, String username_hash) throws IOException {
+        System.out.println(sok);
         out.writeByte('R');
         out.writeUTF(ip);
         out.writeUTF(username);
@@ -185,7 +187,7 @@ public class ServerConnection implements ClientListener{
             {
                 for (;;)
                 {
-                    String to,from,username,ip,error, hash;
+                    String to,from,username,ip,error;
                     int status;
                     byte b = in.readByte();
                     switch (b)
@@ -211,7 +213,7 @@ public class ServerConnection implements ClientListener{
                             String port = in.readUTF();
                             serverListener.initConversation(from,to, port);
                             break;
-                        case 'R':
+                        case 'C':
                             username = in.readUTF();
                             status = in.readByte();
                             serverListener.createAccountResponse(username, status);

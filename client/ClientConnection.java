@@ -10,11 +10,11 @@
 
 //imports go here
 
-import javax.net.ssl.SSLServerSocket;
-import javax.net.ssl.SSLSocket;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 /* Client connection between two peers. Used for chat communication.
 
@@ -24,8 +24,9 @@ import java.io.IOException;
 */
 public class ClientConnection implements PeerListener{
 
-    private SSLSocket sok;
-    private SSLServerSocket ssok;
+    private Socket sok;
+    //private SSLServerSocket ssok;
+    private ServerSocket serverSocket;
     private PeerListener peerListener;
     private DataOutputStream out;
     private DataInputStream in;
@@ -36,7 +37,7 @@ public class ClientConnection implements PeerListener{
      * @param peerListener - database reference.
      * @throws IOException
      */
-    public ClientConnection(SSLSocket sok, PeerListener peerListener) throws IOException
+    public ClientConnection(Socket sok, PeerListener peerListener) throws IOException
     {
         this.sok = sok;
         out = new DataOutputStream (sok.getOutputStream());
@@ -45,8 +46,9 @@ public class ClientConnection implements PeerListener{
         new ReaderThread().start();
     }
 
-    public ClientConnection(SSLServerSocket ssok, PeerListener peerListener) throws IOException{
-        SSLSocket sok  = (SSLSocket)(ssok.accept());
+    public ClientConnection(ServerSocket serverSocket, PeerListener peerListener) throws IOException{
+        this.serverSocket = serverSocket;
+        sok = serverSocket.accept();
         out = new DataOutputStream (sok.getOutputStream());
         in = new DataInputStream (sok.getInputStream());
         this.peerListener = peerListener;
@@ -97,8 +99,8 @@ public class ClientConnection implements PeerListener{
      */
     @Override
     public void stop(String user) throws IOException {
-        if(ssok != null){
-            ssok.close();
+        if(serverSocket != null){
+            serverSocket.close();
         }else {
             out.writeByte('Q');
             out.writeUTF(user);

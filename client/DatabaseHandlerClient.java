@@ -41,7 +41,7 @@ public class DatabaseHandlerClient {
             Class.forName("org.h2.Driver");
 
             //creates the connection
-            conn = DriverManager.getConnection("jdbc:h2:" + path + ";CIPHER=AES", user, password);
+            conn = DriverManager.getConnection("jdbc:h2:" +  path + user + ";CIPHER=AES", user, "filepwd "+password);
             isConnected = true;
         	hash = getPasswordHash(password);
         	map = new HashMap<String,String>();

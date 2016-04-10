@@ -10,12 +10,12 @@
 
 //imports go here
 
-import javax.net.ssl.SSLServerSocket;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -94,9 +94,6 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
             frame = new JFrame();
         }
 
-
-
-
         frame.setTitle("Chat Client");
         frame.setSize(600, 700);
         frame.setLayout(new BorderLayout());
@@ -109,6 +106,9 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
         messageDim = new Dimension(380, 700);
         currentMessagePanel = new MessagePanel(this, "Tyler", "Not Tyler",messageDim);
         frame.add(currentMessagePanel, BorderLayout.EAST);
+
+        frame.revalidate();
+        frame.repaint();
     }
     public void createChatSession(String user){
         if(currentMessagePanel != null)
@@ -277,9 +277,9 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
         // we have the IP, now it is time to initialize the connection.
         dbHandler.updateFriendIP(user, IP);
         //todo get the socket from the managerClient.
-        SSLServerSocket sslss = managerClient.createClientServerConnection();
-        clientListener.initConversation(dbHandler.getName(), dbHandler.getHash(), user, sslss.getLocalPort() +"");
-        peerListener.put(user, managerClient.createClientConnection(sslss));
+        ServerSocket serverSocket = managerClient.createClientServerConnection();
+        clientListener.initConversation(dbHandler.getName(), dbHandler.getHash(), user, serverSocket.getLocalPort() + "");
+        peerListener.put(user, managerClient.createClientConnection(serverSocket));
     }
 
     /**
@@ -309,7 +309,8 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
                 dialogButton);
         if(dialogResult == 0) {
             //yes
-            peerListener.put(from, managerClient.createClientConnection(dbHandler.getFriendIP(from), port));
+            peerListener.put(from, managerClient.createClientConnection(dbHandler.getFriendIP(from),
+                    Integer.parseInt(port)));
             start(from);
         }
     }
@@ -325,7 +326,7 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
     @Override
     public void createAccountResponse(String user, int status) throws IOException {
         if(status == 1) {
-            dbHandler = new DatabaseHandlerClient(registerPanel.getPath(),
+            dbHandler = new DatabaseHandlerClient(registerPanel.getPath()+"/",
                     registerPanel.getUsername(),
                     registerPanel.getPassword());
             dbHandler.init(user, managerClient.getServerIP());

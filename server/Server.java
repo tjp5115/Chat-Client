@@ -24,7 +24,7 @@ class Server
 	{
 		//create database handler and manager
 		DatabaseHandlerServer db = new DatabaseHandlerServer();
-		ManagerServer manager = new ManagerServer(PORT);
+		ManagerServer manager = new ManagerServer("localhost",PORT);
 		manager.setDatabaseHandler(db);
 		manager.run();
 	}
