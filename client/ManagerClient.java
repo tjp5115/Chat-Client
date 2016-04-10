@@ -14,6 +14,8 @@ import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.*;
+import java.net.InetAddress;
+import java.util.Arrays;
 
 /* class Description
 
@@ -29,6 +31,7 @@ class ManagerClient
 	private String SERVER_HOST;
 	private ServerConnection serverConnection;
 	private ClientConnection clientConnection;
+	SSLSocket  c;
 
 	public ManagerClient(ChatFrame inGUI)
 	{
@@ -47,7 +50,11 @@ class ManagerClient
 	
 	public String getUserIP()
 	{
-		return "";
+		byte []addr = c.getInetAddress().getAddress();
+		StringBuffer out = new StringBuffer();
+		for(int i = 0; i < addr.length; ++i)
+			out.append(addr[i]+".");
+		return out.substring(0,out.length()-1);
 	}
 
 	/**
@@ -112,7 +119,8 @@ class ManagerClient
 		SSLSocketFactory sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
 		try
 		{
-			SSLSocket c = (SSLSocket) sf.createSocket(SERVER_HOST, 5432);
+			c = (SSLSocket) sf.createSocket(SERVER_HOST, 5432);
+
 			serverConnection = new ServerConnection(c, GUI);
 			GUI.setClientListener(serverConnection);
 		}catch (IOException ioe){

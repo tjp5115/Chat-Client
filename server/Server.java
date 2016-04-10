@@ -17,36 +17,19 @@
 
 */
 
-import java.net.Inet4Address;
-import java.net.UnknownHostException;
-
 class Server
 {
+	private final static int PORT = 5432;
 	public static void main(String args[]) throws Exception
 	{
-		if(args.length != 2) useage();
-		String host = "";
-		int port = 5432; //port is 5432
-
-		//get host address
-		try
-		{
-			Inet4Address address = (Inet4Address) Inet4Address.getByName("localhost");
-			host = address.getHostName();
-		}
-		catch(UnknownHostException e)
-		{
-			e.printStackTrace();
-		}
-
 		//create database handler and manager
 		DatabaseHandlerServer db = new DatabaseHandlerServer();
-		ManagerServer manager = new ManagerServer(host, port);
+		ManagerServer manager = new ManagerServer(PORT);
 		manager.setDatabaseHandler(db);
 		manager.run();
 	}
 
-	private static void useage()
+	private static void usage()
 	{
 		System.err.println("Usage: java Server <host_address> <port>");
 		throw new IllegalArgumentException();

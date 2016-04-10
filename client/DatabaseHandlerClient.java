@@ -9,6 +9,7 @@
 */
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.sql.*;
 import java.security.MessageDigest;
@@ -262,7 +263,17 @@ public class DatabaseHandlerClient {
             System.out.println("error creating the conn for database: HASH error");
             e.printStackTrace();
         }
-        return String.format("%02X", md.digest(pw.getBytes()));
+        StringBuffer hexString = new StringBuffer();
+        byte []hash = md.digest(pw.getBytes());
+        for (int i = 0; i < hash.length; i++) {
+            if ((0xff & hash[i]) < 0x10) {
+                hexString.append("0"
+                        + Integer.toHexString((0xFF & hash[i])));
+            } else {
+                hexString.append(Integer.toHexString(0xFF & hash[i]));
+            }
+        }
+        return hexString.toString();
     }
 
 }//end class

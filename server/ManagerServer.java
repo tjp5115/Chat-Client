@@ -26,13 +26,11 @@ class ManagerServer
 {
 	private DatabaseHandlerServer dbHandler;
 	private ArrayList<ToClient> clientList;
-	private String host;
 	private int port;
 
-	public ManagerServer(String host, int port)
+	public ManagerServer(int port)
 	{
 		clientList = new ArrayList<ToClient>();
-		this.host = host;
 		this.port = port;
 	}
 
@@ -50,6 +48,7 @@ class ManagerServer
 		{
 			SSLServerSocketFactory ssf = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
 			SSLServerSocket serverSocket = (SSLServerSocket) ssf.createServerSocket(port);
+			System.out.println(serverSocket.getInetAddress().toString());
 
 			for(;;)
 			{

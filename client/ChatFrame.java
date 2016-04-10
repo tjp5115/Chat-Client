@@ -51,11 +51,13 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
         this(null);
     }
 
+
+
     //setter
     public void setClientListener(ClientListener clientListener){
         this.clientListener = clientListener;
     }
-
+    public void setManagerClient(ManagerClient managerClient){this.managerClient = managerClient;}
     /**
      * creates and sets the current frame to the login frame of the gui
      */
@@ -176,9 +178,13 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
      */
     public void registerUsername() {
         try {
-            clientListener.createAccount(managerClient.getUserIP(),
-                    registerPanel.getUsername(),
-                    dbHandler.getPasswordHash(registerPanel.getPassword()));
+            String hash = dbHandler.getPasswordHash(registerPanel.getPassword());
+            String ip = managerClient.getUserIP();
+            String username = registerPanel.getUsername();
+            clientListener.createAccount(ip,
+                    username,
+                    hash
+                    );
         } catch (IOException e) {
             e.printStackTrace();
         }
