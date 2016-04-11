@@ -93,7 +93,7 @@ public class RegisterPanel extends JPanel{
         return userText.getText();
     }
     public String getPassword(){
-        return Arrays.toString(passwordText.getPassword());
+        return new String(passwordText.getPassword());
     }
     public String getPath(){
         return databaseText.getText();

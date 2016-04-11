@@ -177,13 +177,14 @@ public class DatabaseHandlerServer implements ClientListener{
     public synchronized void logon(String user, String user_hash) throws IOException{
 		if(check(user,user_hash)){
 			ToClient t = cons.get(user.concat(user_hash));
+			t.loginSuccess();
 			try{
 				Statement stmt = conn.createStatement();
 				stmt.execute("UPDATE users " +
-					"SET IP=" + t.getIP() +", ONLINE=TRUE"
-					+ " WHERE USER=" + user + ";");
+					"SET IP='" + t.getIP() +"', ONLINE=TRUE"
+					+ " WHERE USER='" + user + "';");
 
-				ResultSet s = stmt.executeQuery("SELECT MESSAGE FROM MESSAGES WHERE UESR=\'" + user + "\';");
+				ResultSet s = stmt.executeQuery("SELECT MESSAGE FROM MESSAGES WHERE USER=\'" + user + "\';");
 				while(s.next()){
 					t.userFriendStatus(s.getString(1));
 				}//end while
@@ -301,8 +302,10 @@ public class DatabaseHandlerServer implements ClientListener{
 		boolean ans = false;
 		try{
 			Statement stmt = conn.createStatement();
-			ResultSet s = stmt.executeQuery("SELECT HASH FROM USERS WHERE USER=\'" + name + "\';");
-			ans = hash.equals(s.getString(1));
+			ResultSet s = stmt.executeQuery("SELECT HASH FROM USERS WHERE USER='" + name + "';");
+			if(s.next()) {
+				ans = hash.equals(s.getString(1));
+			}
 		}//end try
 		catch(SQLException e){
 			System.out.println("error check");
@@ -328,7 +331,7 @@ public class DatabaseHandlerServer implements ClientListener{
 			}//end if
 			else{
 				ToClient t = cons.get(from.concat(from_hash));
-				t.error("Your not authehtic!");
+				t.error("You are not authentic!");
 			}
 		}//end try
 		catch(SQLException e){

@@ -347,6 +347,14 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
         peerListener.get(user).stop(user);
     }
 
+    /**
+     * status of login
+     */
+    @Override
+    public void loginSuccess() throws IOException {
+        createDefaultChatFrame();
+    }
+
     //start of WindowListener interface
     public void windowOpened(WindowEvent e) {}
 
@@ -364,7 +372,7 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
             clientListener.logoff(dbHandler.getName(), dbHandler.getHash());
             for(String f: messagePanel.keySet())
                 stop(f);
-
+            System.exit(0);
         }catch(IOException ioe){
             System.err.println("i dont think you will see this. Error while closed.");
         }

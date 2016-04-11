@@ -222,8 +222,11 @@ public class ServerConnection implements ClientListener{
                             from = in.readUTF();
                             serverListener.rejectedConverstaion(from);
                             break;
+                        case 'R':
+                            serverListener.loginSuccess();
+                            break;
                         default:
-                            System.err.println ("Bad message");
+                            System.err.println ("Bad message: " + b);
                             break;
                     }
                 }

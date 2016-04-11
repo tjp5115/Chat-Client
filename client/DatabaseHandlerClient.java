@@ -8,6 +8,9 @@
 *  $Log$
 */
 
+import org.h2.tools.ChangeFileEncryption;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,9 +42,13 @@ public class DatabaseHandlerClient {
         try {
             //This tells it to use the h2 driver
             Class.forName("org.h2.Driver");
-
             //creates the connection
-            conn = DriverManager.getConnection("jdbc:h2:" +  path + user + ";CIPHER=AES", user, "filepwd "+password);
+            if(path.endsWith("/")) {
+                conn = DriverManager.getConnection("jdbc:h2:" + path + user + ";CIPHER=AES", user, "filepwd " + password);
+            }else{
+                path = path.substring(0,path.length()-6);
+                conn = DriverManager.getConnection("jdbc:h2:file:" + path + ";CIPHER=AES;IFEXISTS=TRUE", user,  "filepwd " + password);
+            }
             isConnected = true;
         	hash = getPasswordHash(password);
         	map = new HashMap<String,String>();

@@ -70,5 +70,10 @@ public interface ServerListener {
      * @param user - 'friend' who rejected.
      */
     public void rejectedConverstaion(String user) throws IOException;
-
+    /**
+     * status of login
+     * @param user - .
+     * @param status - 1 = accepted 2 = denied.
+     */
+    void loginSuccess()throws IOException;
 }

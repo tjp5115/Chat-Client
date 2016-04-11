@@ -132,10 +132,8 @@ public class ToClient implements ServerListener{
      *  0 - reject friend request
      * @throws IOException
      */
-    public void friendRequestResponse(String user, int status) throws IOException {
+    public void loginSuccess() throws IOException {
 		out.writeByte('R');
-		out.writeUTF(user);
-		out.writeByte(status);
 		out.flush();
 	}//end
 
@@ -218,6 +216,7 @@ public class ToClient implements ServerListener{
 						case 'J':
 							username = in.readUTF();
 							hash = in.readUTF();
+							System.out.println(username + " " + hash );
 							clientListener.add(username, hash,toc);
 							clientListener.logon(username, hash);
 							break;

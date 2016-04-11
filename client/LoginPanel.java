@@ -97,7 +97,7 @@ public class LoginPanel extends JPanel {
     }
 
     public String getPassword(){
-        return Arrays.toString(passwordText.getPassword());
+        return new String(passwordText.getPassword());
     }
 
     public String getUsername(){
