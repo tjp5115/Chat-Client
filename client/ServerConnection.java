@@ -135,7 +135,7 @@ public class ServerConnection implements ClientListener{
         out.writeUTF(from_hash);
         out.writeUTF(to);
         out.writeUTF(port);
-        System.out.println("S "+ from + " " + from_hash + " " + to + " " + port);
+        System.out.println("--> S "+ from + " " + from_hash + " " + to + " " + port);
         out.flush();
     }
 
@@ -153,7 +153,7 @@ public class ServerConnection implements ClientListener{
         out.writeUTF(from);
         out.writeUTF(from_hash);
         out.writeUTF(to);
-        System.out.println("G "+ from + " " + from_hash + " " + to);
+        System.out.println("--> G "+ from + " " + from_hash + " " + to);
         out.flush();
     }
 
@@ -199,13 +199,13 @@ public class ServerConnection implements ClientListener{
                             from = in.readUTF();
                             to = in.readUTF();
                             status = in.readByte();
-                            System.out.println("F " + from + " " + to + " " + status);
+                            //System.out.println("<-- F " + from + " " + to + " " + status);
                             serverListener.userFriendStatus(from, to, status);
                             break;
                         case 'G':
                             username = in.readUTF();
                             ip = in.readUTF();
-                            System.out.println("G " + username + " " + ip);
+                            System.out.println("<-- G " + username + " " + ip);
                             serverListener.IP(username, ip);
                             break;
                         case 'E':
@@ -216,7 +216,7 @@ public class ServerConnection implements ClientListener{
                             from = in.readUTF();
                             to = in.readUTF();
                             String port = in.readUTF();
-                            System.out.println("G " + from + " " + to + " " + port);
+                            System.out.println("<-- S " + from + " " + to + " " + port);
                             serverListener.initConversation(from,to, port);
                             break;
                         case 'C':

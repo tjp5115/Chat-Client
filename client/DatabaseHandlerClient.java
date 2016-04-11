@@ -11,6 +11,7 @@
 import org.h2.tools.ChangeFileEncryption;
 
 import java.io.File;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -31,8 +32,9 @@ public class DatabaseHandlerClient {
     Connection conn;
     private boolean isConnected = false;
     String hash;
-    HashMap<String,String> map;
-
+    HashMap<String,String> ip;
+    HashMap<String,String> port;
+    private String user;
     /*Default constructor
     @parm: String - path to database file
     @parm: String - username
@@ -48,8 +50,7 @@ public class DatabaseHandlerClient {
             }else{
                 path = path.substring(0,path.length()-6);
                 conn = DriverManager.getConnection("jdbc:h2:file:" + path + ";CIPHER=AES;IFEXISTS=TRUE;USER="+user+";", user,  "filepwd " + password);
-                System.out.println(getName() + " has logged in.");
-                System.out.println(user + " has logged in.");
+                this.user = user;
                 /*
                 new Thread(new Runnable() {
                     @Override
@@ -65,7 +66,8 @@ public class DatabaseHandlerClient {
             }
             isConnected = true;
         	hash = getPasswordHash(password);
-        	map = new HashMap<String,String>();
+        	ip = new HashMap<String,String>();
+            port = new HashMap<String,String>();
         }//end try
         catch (SQLException | ClassNotFoundException e) {
             System.out.println("error creating the conn for database");
@@ -102,12 +104,9 @@ public class DatabaseHandlerClient {
 		boolean t = false;
 		try{
 			Statement stmt = conn.createStatement();
-			ResultSet s = stmt.executeQuery("SELECT user FROM username WHERE USER=" + username + ";");
-			if (s.getString(1) == null ){
-				t= false;
-			}
-			else{
-				t= true;
+			ResultSet s = stmt.executeQuery("SELECT user FROM username WHERE USER='" + username + "';");
+			if (s.next()){
+				t = false;
 			}
         }//end try
         catch(SQLException e){
@@ -208,6 +207,7 @@ public class DatabaseHandlerClient {
 
 	*/
 	public String getName(){
+        /*
 		String ans = "";
 		try{
 			Statement stmt = conn.createStatement();
@@ -221,6 +221,8 @@ public class DatabaseHandlerClient {
             e.printStackTrace();
         }//end catch
         return ans;
+        */
+        return user;
 	}//end
 
     /**
@@ -238,8 +240,8 @@ public class DatabaseHandlerClient {
      * @param ip - ip of friend;
      */
     public void updateFriendIP(String username, String ip){
-		map.remove(username);
-		map.put(username, ip);
+		this.ip.remove(username);
+		this.ip.put(username, ip);
     }
 
     /**
@@ -247,9 +249,21 @@ public class DatabaseHandlerClient {
      * @param username
      * @return
      */
-    //todo
     public String getFriendIP(String username){
-        return map.get(username);
+        return ip.get(username);
+    }
+
+    public void addFriendPort(String username, String port){
+        this.port.put(username,port);
+    }
+
+    /**
+     * get ip of friend
+      * @param username
+     * @return
+     */
+    public String getFriendPort(String username){
+        return port.get(username);
     }
 
     /**
@@ -258,7 +272,7 @@ public class DatabaseHandlerClient {
      * @param ip - ip of friend;
      */
     public void addFriendIP(String username, String ip){
-		map.put(username,ip);
+		this.ip.put(username,ip);
     }
 
     /**
@@ -267,7 +281,7 @@ public class DatabaseHandlerClient {
      *
      */
     public void removeFriendIP(String username){
-        map.remove(username);
+        ip.remove(username);
     }
 
 

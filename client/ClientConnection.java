@@ -46,12 +46,13 @@ public class ClientConnection implements PeerListener{
         new ReaderThread().start();
     }
 
-    public ClientConnection(ServerSocket serverSocket, PeerListener peerListener) throws IOException{
+    public ClientConnection(ServerSocket serverSocket, PeerListener peerListener, String to) throws IOException{
         this.serverSocket = serverSocket;
+        this.peerListener = peerListener;
+        peerListener.start(to);
         sok = serverSocket.accept();
         out = new DataOutputStream (sok.getOutputStream());
         in = new DataInputStream (sok.getInputStream());
-        this.peerListener = peerListener;
         new ReaderThread().start();
     }
 
@@ -77,6 +78,7 @@ public class ClientConnection implements PeerListener{
         out.writeUTF(from);
         out.writeUTF(to);
         out.writeUTF(msg);
+        System.out.println("--> M " + from + " " + to + " " + msg);
         out.flush();
     }
 
@@ -133,6 +135,7 @@ public class ClientConnection implements PeerListener{
                             from = in.readUTF();
                             to = in.readUTF();
                             message = in.readUTF();
+                            System.out.println("<-- M " + from + " " + to + " " + message);
                             peerListener.message(from, to, message);
                             break;
                         case 'S':

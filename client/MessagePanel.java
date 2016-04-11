@@ -44,7 +44,7 @@ public class MessagePanel extends JPanel{
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    chatFrame.message(friend, user, messageText.getText());
+                    chatFrame.message(user, friend, messageText.getText());
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
@@ -96,6 +96,8 @@ public class MessagePanel extends JPanel{
         messages.add(messagePanel);
         messages.invalidate();
         messages.repaint();
+        invalidate();
+        repaint();
 
 
     }

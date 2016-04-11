@@ -69,12 +69,12 @@ class ManagerClient
 		try
 		{
 			//SSLSocket c = (SSLSocket) sf.createSocket(_ip, Integer.parseInt(_port));
-			Socket c = new Socket();
-			c.bind(new InetSocketAddress(ip,port));
+			Socket c = new Socket(ip,port);
 			peer = new ClientConnection(c, GUI);
 		}catch (IOException ioe)
 		{
 			System.err.println("IOException caught. Exiting");
+			ioe.printStackTrace();
 		}
 		catch(NumberFormatException e)
 		{
@@ -105,10 +105,10 @@ class ManagerClient
 		return serverSocket;
 	}
 
-	public PeerListener createClientConnection(ServerSocket serverSocket)
+	public PeerListener createClientConnection(ServerSocket serverSocket, String to)
 	{
 		try {
-			return new ClientConnection(serverSocket, GUI);
+			return new ClientConnection(serverSocket, GUI, to);
 		} catch (IOException e) {
 			System.err.println("IOException while creating a clientConnection in the manager.");
 		}

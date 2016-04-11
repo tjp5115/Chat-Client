@@ -191,7 +191,6 @@ public class DatabaseHandlerServer implements ClientListener{
 			cons.put(username, t);
 			cons.put(username.concat(username_hash),t);
 			t.createAccountResponse(username,1);
-			t.loginSuccess();
 		}//end if
 		else{//rejected
 			t.createAccountResponse(username,0);

@@ -228,7 +228,7 @@ public class ToClient implements ServerListener{
 							hash = in.readUTF();
 							to = in.readUTF();
 							String port = in.readUTF();
-							System.out.println("<-- S" + from+ " " + hash+ " " + to + " " + port);
+							System.out.println("<-- S " + from+ " " + hash+ " " + to + " " + port);
 							clientListener.initConversation(from, hash, to, port);
 							break;
 						case 'G':

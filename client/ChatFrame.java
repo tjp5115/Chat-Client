@@ -11,6 +11,7 @@
 //imports go here
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -46,6 +47,8 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
         createLoginFrame();
         //createDefaultChatFrame();
         frame.setVisible(true);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        messageDim = new Dimension(380, 700);
     }
     ChatFrame(){
         this(null);
@@ -103,7 +106,6 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
         friendPanel = new FriendPanel(this, friendDim, dbHandler.getFriends());
         frame.add(friendPanel,BorderLayout.WEST);
 
-        messageDim = new Dimension(380, 700);
 
         frame.revalidate();
         frame.repaint();
@@ -112,9 +114,10 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
         if(currentMessagePanel != null)
             currentMessagePanel.setVisible(false);
 
-        new MessagePanel(this, dbHandler.getName(), user, messageDim);
+        currentMessagePanel = new MessagePanel(this, dbHandler.getName(), user, messageDim);
         messagePanel.put(user, currentMessagePanel) ;
         currentMessagePanel.setPreferredSize(messageDim);
+        frame.add(currentMessagePanel, BorderLayout.EAST);
 
         frame.revalidate();
         frame.repaint();
@@ -210,9 +213,15 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
      */
     @Override
     public void message(String from, String to, String msg) throws IOException {
-        messagePanel.get(from).addMessage(from, msg);
-        if(from.equals(dbHandler.getName()))
+        if(from.equals(dbHandler.getName())){
+            messagePanel.get(to).addMessage(from, msg);
             peerListener.get(to).message(from,to,msg);
+        }else{
+            messagePanel.get(from).addMessage(to, msg);
+        }
+
+        frame.invalidate();
+        frame.repaint();
     }
 
     /**
@@ -289,11 +298,17 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
     @Override
     public void IP(String user, String IP) throws IOException {
         // we have the IP, now it is time to initialize the connection.
-        dbHandler.updateFriendIP(user, IP);
-        //todo get the socket from the managerClient.
-        ServerSocket serverSocket = managerClient.createClientServerConnection();
-        clientListener.initConversation(dbHandler.getName(), dbHandler.getHash(), user, serverSocket.getLocalPort() + "");
-        peerListener.put(user, managerClient.createClientConnection(serverSocket));
+        dbHandler.addFriendIP(user, IP);
+        if(dbHandler.getFriendPort(user) == null ) {
+            ServerSocket serverSocket = managerClient.createClientServerConnection();
+            clientListener.initConversation(dbHandler.getName(), dbHandler.getHash(), user, serverSocket.getLocalPort() + "");
+            peerListener.put(user, managerClient.createClientConnection(serverSocket,user));
+        }else{
+            peerListener.put(user,
+                    managerClient.createClientConnection(dbHandler.getFriendIP(user),
+                    Integer.parseInt(dbHandler.getFriendPort(user))));
+            start(user);
+        }
     }
 
     /**
@@ -316,16 +331,15 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
      */
     @Override
     public void initConversation(String from, String to, String port) throws IOException {
-        if(!dbHandler.isFriend(from)) return;
+        //if(!dbHandler.isFriend(from)) return;
         int dialogButton = JOptionPane.YES_NO_OPTION;
         int dialogResult = JOptionPane.showConfirmDialog(null, "Do you want to start a conversation with " + from,
                 "Init chat conversation",
                 dialogButton);
         if(dialogResult == 0) {
             //yes
-            peerListener.put(from, managerClient.createClientConnection(dbHandler.getFriendIP(from),
-                    Integer.parseInt(port)));
-            start(from);
+            dbHandler.addFriendPort(from,port);
+            clientListener.getIP(to,dbHandler.getHash(),from);
         }
     }
 
@@ -344,6 +358,7 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
                     registerPanel.getUsername(),
                     registerPanel.getPassword());
             dbHandler.init(user, managerClient.getServerIP());
+            loginSuccess();
         } else
             JOptionPane.showMessageDialog(null, "Username is taken, select a new one.",
                     "Error",
