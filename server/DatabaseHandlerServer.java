@@ -96,6 +96,16 @@ public class DatabaseHandlerServer implements ClientListener{
      */
     public synchronized void friendRequest(String from, String from_hash, String to, int status) throws IOException{
 		if(check(from, from_hash)){
+			try{
+				Statement stmt = conn.createStatement();
+				ResultSet s = stmt.executeQuery("SELECT HASH FROM USERS WHERE UESR=\'" + to + "\';");
+				String test = s.getString(1);
+				t = cons.get(to.concat(test));
+			}//end try
+			catch(SQLException e){
+				System.out.println("error friend request");
+				e.printStackTrace();
+			}//end catch
 			ToClient t = cons.get(to.concat(from_hash));
 			//client isn't online
 			if(t == null){
