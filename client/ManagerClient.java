@@ -95,11 +95,11 @@ class ManagerClient
 		try
 		{
 			//serverSocket = (SSLServerSocket) ssf.createServerSocket(0);
-			serverSocket = new ServerSocket();
+			serverSocket = new ServerSocket(0);
 		}
 		catch(Exception e)
 		{
-			System.err.println("Exception caught");
+			System.err.println("Exception caught while creating Client Server connection");
 		}
 
 		return serverSocket;

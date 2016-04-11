@@ -47,7 +47,21 @@ public class DatabaseHandlerClient {
                 conn = DriverManager.getConnection("jdbc:h2:" + path + user + ";CIPHER=AES", user, "filepwd " + password);
             }else{
                 path = path.substring(0,path.length()-6);
-                conn = DriverManager.getConnection("jdbc:h2:file:" + path + ";CIPHER=AES;IFEXISTS=TRUE", user,  "filepwd " + password);
+                conn = DriverManager.getConnection("jdbc:h2:file:" + path + ";CIPHER=AES;IFEXISTS=TRUE;USER="+user+";", user,  "filepwd " + password);
+                System.out.println(getName() + " has logged in.");
+                System.out.println(user + " has logged in.");
+                /*
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            org.h2.tools.Server.startWebServer(conn);
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+                */
             }
             isConnected = true;
         	hash = getPasswordHash(password);
@@ -154,8 +168,10 @@ public class DatabaseHandlerClient {
 		try{
 			Statement stmt = conn.createStatement();
 			ResultSet s = stmt.executeQuery("SELECT user FROM username");
+            String me = getName();
 			while(s.next()){
-				f.add(s.getString(1));
+                if(s.getString(1) != me)
+				    f.add(s.getString(1));
 			}//end
 		}//end try
         catch(SQLException e){

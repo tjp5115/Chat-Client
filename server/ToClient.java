@@ -142,8 +142,9 @@ public class ToClient implements ServerListener{
     public void initConversation(String from, String to, String port) throws IOException{
 		out.writeByte ('S');
 		out.writeUTF(from);
-		//out.writeUTF(from_hash);
 		out.writeUTF(to);
+		out.writeUTF(port);
+		System.out.println("--> S " + from+ " " + to + " " + port);
 		out.flush();
 	}
 
@@ -199,7 +200,7 @@ public class ToClient implements ServerListener{
 							hash = in.readUTF();
 							to = in.readUTF();
 							status = in.readByte();
-							System.out.println(from+ " " + hash+ " " + to + " " + status);
+							System.out.println("<-- F " + from+ " " + hash+ " " + to + " " + status);
 							clientListener.friendRequest(from,hash,to,status);
 							break;
 						case 'R':
@@ -227,12 +228,14 @@ public class ToClient implements ServerListener{
 							hash = in.readUTF();
 							to = in.readUTF();
 							String port = in.readUTF();
+							System.out.println("<-- S" + from+ " " + hash+ " " + to + " " + port);
 							clientListener.initConversation(from, hash, to, port);
 							break;
 						case 'G':
 							from = in.readUTF();
 							hash = in.readUTF();
 							to = in.readUTF();
+							System.out.println("<-- G " + from+ " " + hash+ " " + to);
 							clientListener.getIP(from, hash, to);
 							break;
 						default:

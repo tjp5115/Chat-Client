@@ -272,8 +272,7 @@ public class DatabaseHandlerServer implements ClientListener{
 				Statement stmt = conn.createStatement();
 				ResultSet s = stmt.executeQuery("SELECT HASH FROM USERS WHERE USER='" + to + "';");
 				if(s.next()) {
-					String test = s.getString(1);
-					t = cons.get(to.concat(test));
+					t = cons.get(to.concat(s.getString(1)));
 				}
 			}//end try
 			catch(SQLException e){
@@ -285,6 +284,7 @@ public class DatabaseHandlerServer implements ClientListener{
 				n.error(to + " is not online");
 			}//end if
 			else{
+				System.out.println("Init conversation");
 				t.initConversation(from,to,port);
 			}//end
 		}//end if
@@ -308,9 +308,12 @@ public class DatabaseHandlerServer implements ClientListener{
 				try{
 					Statement stmt = conn.createStatement();
 					String sql = "SELECT IP FROM USERS WHERE USER='" + to + "';";
+					//System.out.println(sql);
 					ResultSet s = stmt.executeQuery(sql);
 					if(s.next()) {
 						n.IP(to, s.getString(1));
+					}else{
+						n.error("Error setting up chat");
 					}
 				}//end try
 				catch(SQLException e){
@@ -343,8 +346,12 @@ public class DatabaseHandlerServer implements ClientListener{
 			if(s.next()) {
 				//s.beforeFirst();
 				ans = hash.equals(s.getString(1));
+				/*
+				System.out.println("Check:");
 				System.out.println(hash);
+				System.out.println("==");
 				System.out.println(s.getString(1));
+				*/
 			}
 			//org.h2.tools.Server.startWebServer(conn);
 		}//end try

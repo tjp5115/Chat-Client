@@ -100,7 +100,7 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
         Dimension friendDim = new Dimension(200,700);
 
         //friendPanel = new FriendPanel(this, friendDim, dbHandler.getFriends());
-        friendPanel = new FriendPanel(this, friendDim, new ArrayList() );
+        friendPanel = new FriendPanel(this, friendDim, dbHandler.getFriends());
         frame.add(friendPanel,BorderLayout.WEST);
 
         messageDim = new Dimension(380, 700);

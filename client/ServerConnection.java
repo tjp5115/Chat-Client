@@ -135,6 +135,7 @@ public class ServerConnection implements ClientListener{
         out.writeUTF(from_hash);
         out.writeUTF(to);
         out.writeUTF(port);
+        System.out.println("S "+ from + " " + from_hash + " " + to + " " + port);
         out.flush();
     }
 
@@ -152,6 +153,7 @@ public class ServerConnection implements ClientListener{
         out.writeUTF(from);
         out.writeUTF(from_hash);
         out.writeUTF(to);
+        System.out.println("G "+ from + " " + from_hash + " " + to);
         out.flush();
     }
 
@@ -164,6 +166,7 @@ public class ServerConnection implements ClientListener{
      */
     @Override
     public void rejectConversation(String from, String from_hash, String to) throws IOException{
+        out.writeByte('Z');
         out.writeUTF(from);
         out.writeUTF(from_hash);
         out.writeUTF(to);
@@ -202,6 +205,7 @@ public class ServerConnection implements ClientListener{
                         case 'G':
                             username = in.readUTF();
                             ip = in.readUTF();
+                            System.out.println("G " + username + " " + ip);
                             serverListener.IP(username, ip);
                             break;
                         case 'E':
@@ -212,6 +216,7 @@ public class ServerConnection implements ClientListener{
                             from = in.readUTF();
                             to = in.readUTF();
                             String port = in.readUTF();
+                            System.out.println("G " + from + " " + to + " " + port);
                             serverListener.initConversation(from,to, port);
                             break;
                         case 'C':

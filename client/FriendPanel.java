@@ -34,8 +34,6 @@ public class FriendPanel extends JPanel {
     Dimension buttonSize;
     FriendPanel(ChatFrame cf, Dimension dim, ArrayList<String> friends){
         this.friends = friends;
-        for(String f: friends)
-            addFriend(f);
 
         chatFrame = cf;
         setPreferredSize(dim);
@@ -76,6 +74,9 @@ public class FriendPanel extends JPanel {
         options.add(remove);
         options.setPreferredSize(optionsDim);
         add(options, BorderLayout.SOUTH);
+
+        for(String f: friends)
+            addFriend(f);
     }
 
     public void addFriend(String friend){
