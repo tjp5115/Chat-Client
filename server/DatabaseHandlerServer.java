@@ -116,6 +116,7 @@ public class DatabaseHandlerServer implements ClientListener{
 		}//end if
 		else{
 			ToClient t = cons.get(to.concat(from_hash));
+			System.out.println(cons);
 			t.error("Your not authehtic!");
 		}
 	}//end friend
@@ -160,8 +161,10 @@ public class DatabaseHandlerServer implements ClientListener{
 				e.printStackTrace();
 			}//end catch
 			cons.remove(ip);
-			cons.put(username,t);
+			cons.put(username, t);
+			cons.put(username.concat(username_hash),t);
 			t.createAccountResponse(username,1);
+			t.loginSuccess();
 		}//end if
 		else{//rejected
 			t.createAccountResponse(username,0);

@@ -94,7 +94,7 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
             frame = new JFrame();
         }
 
-        frame.setTitle("Chat Client");
+        frame.setTitle("Chat Client: " + dbHandler.getName());
         frame.setSize(600, 700);
         frame.setLayout(new BorderLayout());
         Dimension friendDim = new Dimension(200,700);
@@ -104,8 +104,6 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
         frame.add(friendPanel,BorderLayout.WEST);
 
         messageDim = new Dimension(380, 700);
-        currentMessagePanel = new MessagePanel(this, "Tyler", "Not Tyler",messageDim);
-        frame.add(currentMessagePanel, BorderLayout.EAST);
 
         frame.revalidate();
         frame.repaint();
@@ -330,7 +328,6 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
                     registerPanel.getUsername(),
                     registerPanel.getPassword());
             dbHandler.init(user, managerClient.getServerIP());
-            createDefaultChatFrame();
         } else
             JOptionPane.showMessageDialog(null, "Username is taken, select a new one.",
                     "Error",

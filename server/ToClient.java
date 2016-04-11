@@ -125,11 +125,7 @@ public class ToClient implements ServerListener{
 	}//end error
 
     /**
-     * returns the response to made by a user for a friend request
-     * @param user - user name who responded
-     * @param status - status given user selected.
-     *  1 - accepted friend request
-     *  0 - reject friend request
+     * successful login.
      * @throws IOException
      */
     public void loginSuccess() throws IOException {
@@ -217,7 +213,7 @@ public class ToClient implements ServerListener{
 							username = in.readUTF();
 							hash = in.readUTF();
 							System.out.println(username + " " + hash );
-							clientListener.add(username, hash,toc);
+							clientListener.add(username, hash, toc);
 							clientListener.logon(username, hash);
 							break;
 						case 'Q':

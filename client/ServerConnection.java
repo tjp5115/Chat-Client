@@ -196,6 +196,7 @@ public class ServerConnection implements ClientListener{
                             from = in.readUTF();
                             to = in.readUTF();
                             status = in.readByte();
+                            System.out.println("F " + from + " " + to + " " + status);
                             serverListener.userFriendStatus(from, to, status);
                             break;
                         case 'G':
