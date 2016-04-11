@@ -111,6 +111,8 @@ public class DatabaseHandlerServer implements ClientListener{
 			if(t == null){
 				try{
 					Statement stmt = conn.createStatement();
+					String m = "\"" + from + " " + to + " " + status + "\"";
+					m.replaceAll(" ", "_");
 					stmt.execute("INSERT INTO messages VALUES(\"" + from + " " + to + " " + status + "\"," + to+";");
 				}//end try
 				catch(SQLException e){
@@ -199,7 +201,9 @@ public class DatabaseHandlerServer implements ClientListener{
 
 				ResultSet s = stmt.executeQuery("SELECT MESSAGE FROM MESSAGES WHERE USER=\'" + user + "\';");
 				while(s.next()){
-					t.userFriendStatus(s.getString(1));
+					String m = s.getString(1);
+					m.replaceAll("_", " ");
+					t.userFriendStatus(m);
 				}//end while
 			}//end try
 			catch(SQLException e){
