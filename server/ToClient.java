@@ -199,7 +199,8 @@ public class ToClient implements ServerListener{
 							hash = in.readUTF();
 							to = in.readUTF();
 							status = in.readByte();
-							clientListener.friendRequest(from,to,hash,status);
+							System.out.println(from+ " " + hash+ " " + to + " " + status);
+							clientListener.friendRequest(from,hash,to,status);
 							break;
 						case 'R':
 							ip = in.readUTF();
