@@ -104,7 +104,7 @@ public class DatabaseHandlerClient {
 		boolean t = false;
 		try{
 			Statement stmt = conn.createStatement();
-			ResultSet s = stmt.executeQuery("SELECT user FROM username WHERE USER='" + username + "';");
+            ResultSet s = stmt.executeQuery("SELECT name FROM friends WHERE NAME=" + username + ";");
 			if (s.next()){
 				t = false;
 			}
@@ -122,7 +122,7 @@ public class DatabaseHandlerClient {
     public void addFriend(String name){
         try{
             Statement stmt = conn.createStatement();
-            stmt.execute("INSERT INTO username VALUES('" + name + "', 0);");
+            stmt.execute("INSERT INTO friends VALUES('" + name + "', 0);");
         }//end try
         catch(SQLException e){
             System.out.println("error adding friend");
@@ -139,7 +139,7 @@ public class DatabaseHandlerClient {
 		if(t){
 			try{
 				Statement stmt = conn.createStatement();
-				stmt.execute("UPDATE username SET status = 1 WHERE user=\'" + name+ "\';");
+                stmt.execute("UPDATE friends SET status = 1 WHERE name=\'" + name+ "\';");
 			}//end try
 			catch(SQLException e){
 				System.out.println("error updating friend");
@@ -149,7 +149,7 @@ public class DatabaseHandlerClient {
 		else{
 			try{
 				Statement stmt = conn.createStatement();
-				stmt.execute("DELETE * FROM username WHERE user = \'" + name + "\';");
+                stmt.execute("DELETE * FROM friends WHERE name = \'" + name + "\';");
 			}//end try
 			catch(SQLException e){
 				System.out.println("error updating friend");
@@ -166,7 +166,7 @@ public class DatabaseHandlerClient {
 		ArrayList<String> f = new ArrayList<String>();
 		try{
 			Statement stmt = conn.createStatement();
-			ResultSet s = stmt.executeQuery("SELECT user FROM username");
+            ResultSet s = stmt.executeQuery("SELECT name FROM friends");
             String me = getName();
 			while(s.next()){
                 if(s.getString(1) != me)
