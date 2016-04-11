@@ -45,6 +45,16 @@ public class DatabaseHandlerServer implements ClientListener{
 			e.printStackTrace();
 		}//end catch
 		init();
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					org.h2.tools.Server.startWebServer(conn);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}).start();
 	}//end constructor
 
 
@@ -99,9 +109,13 @@ public class DatabaseHandlerServer implements ClientListener{
 			ToClient t = null;
 			try{
 				Statement stmt = conn.createStatement();
-				ResultSet s = stmt.executeQuery("SELECT HASH FROM USERS WHERE USER=\'" + to + "\';");
-				String test = s.getString(1);
-				t = cons.get(to.concat(test));
+				String sql = "SELECT HASH FROM USERS WHERE USER='" + to + "\';";
+				//System.out.println("SQL: "+sql);
+				ResultSet s = stmt.executeQuery(sql);
+				if(s.next()) {
+					String test = s.getString(1);
+					t = cons.get(to.concat(test));
+				}
 			}//end try
 			catch(SQLException e){
 				System.out.println("error friend request");
@@ -111,9 +125,10 @@ public class DatabaseHandlerServer implements ClientListener{
 			if(t == null){
 				try{
 					Statement stmt = conn.createStatement();
-					String m = "\"" + from + " " + to + " " + status + "\"";
-					m.replaceAll(" ", "_");
-					stmt.execute("INSERT INTO messages VALUES(\"" + from + " " + to + " " + status + "\"," + to+";");
+					String m = "'" + from + " " + to + " " + status + "'";
+					String sql = "INSERT INTO messages VALUES(" + m + ",'"+ to +"');";
+					//System.out.println("SQL: "+sql);
+					stmt.execute(sql);
 				}//end try
 				catch(SQLException e){
 					System.out.println("error friend request");
@@ -238,7 +253,7 @@ public class DatabaseHandlerServer implements ClientListener{
 		}//end if
 		else{
 			ToClient t = cons.get(user.concat(user_hash));
-			t.error("Your not authehtic!");
+			t.error("Your not authentic!");
 		}
 	}//end logoff
 
@@ -255,12 +270,14 @@ public class DatabaseHandlerServer implements ClientListener{
 			ToClient t = null;
 			try{
 				Statement stmt = conn.createStatement();
-				ResultSet s = stmt.executeQuery("SELECT HASH FROM USERS WHERE UESR=\'" + to + "\';");
-				String test = s.getString(1);
-				t = cons.get(to.concat(test));
+				ResultSet s = stmt.executeQuery("SELECT HASH FROM USERS WHERE USER='" + to + "';");
+				if(s.next()) {
+					String test = s.getString(1);
+					t = cons.get(to.concat(test));
+				}
 			}//end try
 			catch(SQLException e){
-				System.out.println("error checking if username is taken");
+				System.out.println("error querying user hash");
 				e.printStackTrace();
 			}//end catch
 			if(t == null){
@@ -273,7 +290,7 @@ public class DatabaseHandlerServer implements ClientListener{
 		}//end if
 		else{
 			ToClient t = cons.get(from.concat(from_hash));
-			t.error("Your not authehtic!");
+			t.error("Your not authentic!");
 		}
 	}//end init
 
@@ -290,8 +307,11 @@ public class DatabaseHandlerServer implements ClientListener{
 			if(t != null){
 				try{
 					Statement stmt = conn.createStatement();
-					ResultSet s = stmt.executeQuery("SELECT IP FROM USERS WHERE USER=\'" + to + "\';");
-					n.IP(to,s.getString(1));
+					String sql = "SELECT IP FROM USERS WHERE USER='" + to + "';";
+					ResultSet s = stmt.executeQuery(sql);
+					if(s.next()) {
+						n.IP(to, s.getString(1));
+					}
 				}//end try
 				catch(SQLException e){
 					System.out.println("error getIP");
@@ -304,7 +324,7 @@ public class DatabaseHandlerServer implements ClientListener{
 		}//end if
 		else{
 			ToClient t = cons.get(from.concat(from_hash));
-			t.error("Your not authehtic!");
+			t.error("Your not authentic!");
 		}
 	}//end getIP
 

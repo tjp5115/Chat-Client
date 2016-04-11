@@ -255,11 +255,27 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
                     dialogButton);
             if(dialogResult == 0) {
                 //yes
-                clientListener.friendRequest(from, dbHandler.getHash(), to, 1);
+                clientListener.friendRequest(to, dbHandler.getHash(), from, 1);
+                dbHandler.addFriend(from);
+                friendPanel.addFriend(from);
+                frame.revalidate();
+                frame.repaint();
             } else {
                 //no
-                clientListener.friendRequest(from, dbHandler.getHash(), to, 0);
+                clientListener.friendRequest(to, dbHandler.getHash(), from, 0);
             }
+        }else if(status == 1){
+            JOptionPane.showConfirmDialog(null, from + " accepted you as a friend.",
+                    "friend request",
+                    JOptionPane.PLAIN_MESSAGE);
+            dbHandler.addFriend(from);
+            friendPanel.addFriend(from);
+            frame.revalidate();
+            frame.repaint();
+        }else if(status == 2){
+            JOptionPane.showConfirmDialog(null, from + " declined you as a friend.",
+                    "friend request",
+                    JOptionPane.PLAIN_MESSAGE);
         }
     }
 

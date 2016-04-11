@@ -109,7 +109,7 @@ public class DatabaseHandlerClient {
     public void addFriend(String name){
         try{
             Statement stmt = conn.createStatement();
-            stmt.execute("INSERT INTO username VALUES(\'" + name + "\', 0);");
+            stmt.execute("INSERT INTO username VALUES('" + name + "', 0);");
         }//end try
         catch(SQLException e){
             System.out.println("error adding friend");

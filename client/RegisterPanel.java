@@ -75,6 +75,7 @@ public class RegisterPanel extends JPanel{
 
         databaseText = new JTextField(20);
         databaseText.setText("Database File Directory");
+        databaseText.setText("C:\\Users\\Tydro\\Documents");
         databaseText.setBounds(100, 100, 260, 25);
         add(databaseText);
 

@@ -206,14 +206,14 @@ public class ToClient implements ServerListener{
 							ip = in.readUTF();
 							username = in.readUTF();
 							hash = in.readUTF();
-							System.out.println(ip + " " + username + " " + hash );
+							//System.out.println(ip + " " + username + " " + hash );
 							clientListener.add(ip, toc);
 							clientListener.createAccount(ip, username, hash);
 							break;
 						case 'J':
 							username = in.readUTF();
 							hash = in.readUTF();
-							System.out.println(username + " " + hash );
+							//System.out.println(username + " " + hash );
 							clientListener.add(username, hash, toc);
 							clientListener.logon(username, hash);
 							break;
