@@ -35,9 +35,11 @@ class ManagerClient
 	public ManagerClient(ChatFrame inGUI)
 	{
 		this.GUI = inGUI;
-		this.SERVER_HOST = "localhost";
 	}
 
+	public void setServerIP(String host){
+		SERVER_HOST = host;
+	}
 	/**
 	 * get ip of the user
 	 * @return ip;
@@ -116,17 +118,11 @@ class ManagerClient
 	}
 
 	//send initial message to Server when the program start
-	public void run()
+	public void run() throws IOException
 	{
-		try
-		{
 			socket = new Socket();
 			socket.connect(new InetSocketAddress(SERVER_HOST, SERVER_PORT));
 			serverConnection = new ServerConnection(socket, GUI);
 			GUI.setClientListener(serverConnection);
-		}catch (IOException ioe){
-			System.err.println("IOException caught while creating connection to server. Exiting");
-			System.exit(1);
-		}
 	}
 }

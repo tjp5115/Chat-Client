@@ -56,8 +56,8 @@ public class ChatFrame implements ServerListener, PeerListener
                 try {
                     if(clientListener != null)
                         clientListener.logoff(dbHandler.getName(), dbHandler.getHash());
-                    for(String f: messagePanel.keySet())
-                        peerListener.get(f).stop(dbHandler.getName());
+                    for(PeerListener peer: peerListener.values())
+                        peer.stop(dbHandler.getName());
                     System.exit(0);
                 }catch (Exception E){
                 }
@@ -186,9 +186,14 @@ public class ChatFrame implements ServerListener, PeerListener
             }
         }
         try {
+            managerClient.setServerIP(dbHandler.getServerIP());
+            managerClient.run();
             clientListener.logon(dbHandler.getName(), dbHandler.getHash());
-        }catch(Exception ioe){
-            System.err.println("IOException while logging on to the server.");
+        }catch(IOException ioe){
+            JOptionPane.showMessageDialog(null,
+                    "Error logging into server.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -197,7 +202,10 @@ public class ChatFrame implements ServerListener, PeerListener
      */
     public void registerUsername() {
         try {
-            String hash = dbHandler.getPasswordHash(registerPanel.getPassword());
+            managerClient.setServerIP(registerPanel.getServerIP());
+            managerClient.run();
+            String hash = registerPanel.getPassword();
+            hash = dbHandler.getPasswordHash(hash);
             String ip = managerClient.getUserIP();
             String username = registerPanel.getUsername();
             clientListener.createAccount(ip,
@@ -205,7 +213,10 @@ public class ChatFrame implements ServerListener, PeerListener
                     hash
                     );
         } catch (IOException e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(null,
+                    "Error logging into server.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 

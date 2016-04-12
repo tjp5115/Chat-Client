@@ -28,6 +28,5 @@ class Chat
 		//create ManagerClient, and pass the database and GUI to managerClient
 		ManagerClient managerClient = new ManagerClient(cf);
 		cf.setManagerClient(managerClient);
-		managerClient.run();
 	}
 }

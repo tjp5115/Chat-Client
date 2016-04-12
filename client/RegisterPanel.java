@@ -84,7 +84,17 @@ public class RegisterPanel extends JPanel{
         createUserButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                chatFrame.registerUsername();
+                if(databaseText.getText().isEmpty() ||
+                        IPText.getText().isEmpty() ||
+                        passwordText.getPassword().length == 0 ||
+                        userText.getText().isEmpty()) {
+                    JOptionPane.showMessageDialog(null,
+                            "Fields are Empty.",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }else {
+                    chatFrame.registerUsername();
+                }
             }
         });
         add(createUserButton);
@@ -98,5 +108,8 @@ public class RegisterPanel extends JPanel{
     }
     public String getPath(){
         return databaseText.getText();
+    }
+    public String getServerIP(){
+        return IPText.getText();
     }
 }

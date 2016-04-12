@@ -73,6 +73,8 @@ public class DatabaseHandlerClient {
             System.out.println("error creating the conn for database");
             e.printStackTrace();
         }//end catch
+
+        password = "";
     }//end constructor
 
 

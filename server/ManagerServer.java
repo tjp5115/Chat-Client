@@ -25,12 +25,10 @@ class ManagerServer
 {
 	private DatabaseHandlerServer dbHandler;
 	private int port;
-	private String host;
 
-	public ManagerServer(String host, int port)
+	public ManagerServer(int port)
 	{
 		this.port = port;
-		this.host = host;
 	}
 
 	public void setDatabaseHandler(DatabaseHandlerServer dh)
@@ -46,7 +44,7 @@ class ManagerServer
 		try
 		{
 			ServerSocket serverSocket = new ServerSocket();
-			serverSocket.bind (new InetSocketAddress (host, port));
+			serverSocket.bind (new InetSocketAddress (port));
 			System.out.println(serverSocket.getInetAddress().toString());
 
 			for(;;)
