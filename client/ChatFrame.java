@@ -57,7 +57,7 @@ public class ChatFrame implements ServerListener, PeerListener
                     if(clientListener != null)
                         clientListener.logoff(dbHandler.getName(), dbHandler.getHash());
                     for(String f: messagePanel.keySet())
-                        stop(f);
+                        peerListener.get(f).stop(dbHandler.getName());
                     System.exit(0);
                 }catch (Exception E){
                 }
@@ -265,7 +265,16 @@ public class ChatFrame implements ServerListener, PeerListener
      */
     @Override
     public void stop(String user) throws IOException {
-        clearChatFrame(user);
+        JOptionPane.showConfirmDialog(null, user + " has left the conversation.",
+                "friend request",
+                JOptionPane.PLAIN_MESSAGE);
+        if(currentMessagePanel.equals(messagePanel.get(user))){
+            currentMessagePanel = null;
+        }
+        frame.remove(messagePanel.get(user));
+        messagePanel.remove(user);
+        frame.revalidate();
+        frame.repaint();
     }
 
     @Override
