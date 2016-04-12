@@ -23,7 +23,7 @@ That is making the calls needs to add its self to this class through the add met
 
 public class DatabaseHandlerServer implements ClientListener{
 
-	HashMap<String, ToClient> cons;
+	HashMap<String, ServerListener> cons;
 	Connection conn;
 
 
@@ -32,7 +32,7 @@ public class DatabaseHandlerServer implements ClientListener{
 
 	*/
 	public DatabaseHandlerServer(){
-		cons = new HashMap<String, ToClient>();
+		cons = new HashMap<String, ServerListener>();
 		try {
 			//This tells it to use the h2 driver
 			Class.forName("org.h2.Driver");
@@ -106,7 +106,7 @@ public class DatabaseHandlerServer implements ClientListener{
      */
     public synchronized void friendRequest(String from, String from_hash, String to, int status) throws IOException{
 		if(check(from, from_hash)){
-			ToClient t = null;
+			ServerListener t = null;
 			try{
 				//Statement stmt = conn.createStatement();
 				//String sql = "SELECT HASH FROM USERS WHERE USER='" + to + "\';";
@@ -130,10 +130,9 @@ public class DatabaseHandlerServer implements ClientListener{
 					//String sql = "INSERT INTO messages VALUES(" + m + ",'"+ to +"');";
 					//stmt.execute(sql);
 
-					PreparedStatement stmt = conn.prepareStatement("INSERT INTO messages VALUES(?,?,?);");
+					PreparedStatement stmt = conn.prepareStatement("INSERT INTO messages VALUES(?,?,'friend');");
 					stmt.setString(1, from + " " + to + " " + status );
 					stmt.setString(2, to);
-                    stmt.setString(3, "friend");
 					stmt.execute();
 				}//end try
 				catch(SQLException e){
@@ -148,7 +147,7 @@ public class DatabaseHandlerServer implements ClientListener{
 			}//end
 		}//end if
 		else{
-			ToClient t = cons.get(to.concat(from_hash));
+			ServerListener t = cons.get(to.concat(from_hash));
 			System.out.println(cons);
 			t.error("Your not authentic!");
 		}
@@ -161,7 +160,7 @@ public class DatabaseHandlerServer implements ClientListener{
      * @throws IOException
      */
     public synchronized void createAccount(String ip, String username, String username_hash) throws IOException{
-		ToClient t = cons.get(ip);
+		ServerListener t = cons.get(ip);
 		boolean c = false;
 		//check to see if username is already used
 		try{
@@ -216,7 +215,7 @@ public class DatabaseHandlerServer implements ClientListener{
      */
     public synchronized void logon(String user, String user_hash) throws IOException{
 		if(check(user,user_hash)){
-			ToClient t = cons.get(user.concat(user_hash));
+			ServerListener t = cons.get(user.concat(user_hash));
 			t.loginSuccess();
 			try{
 				PreparedStatement stmt = conn.prepareStatement("UPDATE users SET IP=?, ONLINE=TRUE WHERE USER=?;");
@@ -224,24 +223,25 @@ public class DatabaseHandlerServer implements ClientListener{
 				stmt.setString(2, user);
 				stmt.execute();
 
-				stmt = conn.prepareStatement("SELECT MESSAGE FROM MESSAGES WHERE USER=? AND TYPE=?;");
+				stmt = conn.prepareStatement("SELECT MESSAGE FROM MESSAGES WHERE USER=? AND TYPE='friend';");
 				stmt.setString(1, user);
-                stmt.setString(2,"friend");
 				ResultSet s = stmt.executeQuery();
 				while(s.next()){
-					String m = s.getString(1);
-					m.replaceAll("_", " ");
-					t.userFriendStatus(m);
+					String m[] = s.getString(1).split(" ");
+					t.userFriendStatus(m[0],m[1], Integer.parseInt(m[2]));
 				}//end while
-				stmt = conn.prepareStatement("SELECT MESSAGE FROM MESSAGES WHERE USER=? AND TYPE=?;");
+				stmt = conn.prepareStatement("SELECT MESSAGE FROM MESSAGES WHERE USER=? AND TYPE='remove';");
 				stmt.setString(1, user);
-                stmt.setString(2,"remove");
 			    s = stmt.executeQuery();
 				while(s.next()){
-					String m = s.getString(1);
-					m.replaceAll("_", " ");
-					t.removeFriend(m);
+					String m[] = s.getString(1).split(" ");
+					t.removeFriend(m[0], m[1]);
 				}//end while
+
+				stmt = conn.prepareStatement("DELETE MESSAGES WHERE USER=?;");
+				stmt.setString(1, user);
+				stmt.execute();
+
 			}//end try
 			catch(SQLException e){
 				System.out.println("error logon");
@@ -249,8 +249,8 @@ public class DatabaseHandlerServer implements ClientListener{
 			}//end catch
 		}//end if
 		else{
-			ToClient t = cons.get(user.concat(user_hash));
-			t.error("Your not authehtic!");
+			ServerListener t = cons.get(user.concat(user_hash));
+			t.error("Your are not authentic!");
 		}
 	}//endlogon
 
@@ -276,7 +276,7 @@ public class DatabaseHandlerServer implements ClientListener{
 			cons.remove(user.concat(user_hash));
 		}//end if
 		else{
-			ToClient t = cons.get(user.concat(user_hash));
+			ServerListener t = cons.get(user.concat(user_hash));
 			t.error("Your not authentic!");
 		}
 	}//end logoff
@@ -291,7 +291,7 @@ public class DatabaseHandlerServer implements ClientListener{
      */
     public synchronized void initConversation(String from, String from_hash, String to, String port) throws IOException{
 		if(check(from,from_hash)){
-			ToClient t = null;
+			ServerListener t = null;
 			try{
 				//Statement stmt = conn.createStatement();
 				//ResultSet s = stmt.executeQuery("SELECT HASH FROM USERS WHERE USER='" + to + "';");
@@ -308,7 +308,7 @@ public class DatabaseHandlerServer implements ClientListener{
 				e.printStackTrace();
 			}//end catch
 			if(t == null){
-				ToClient n = cons.get(from);
+				ServerListener n = cons.get(from);
 				n.error(to + " is not online");
 			}//end if
 			else{
@@ -317,7 +317,7 @@ public class DatabaseHandlerServer implements ClientListener{
 			}//end
 		}//end if
 		else{
-			ToClient t = cons.get(from.concat(from_hash));
+			ServerListener t = cons.get(from.concat(from_hash));
 			t.error("Your not authentic!");
 		}
 	}//end init
@@ -330,8 +330,8 @@ public class DatabaseHandlerServer implements ClientListener{
      */
     public synchronized void getIP(String from, String from_hash, String to) throws IOException{
 		if(check(from,from_hash)){
-			ToClient t = cons.get(to);
-			ToClient n = cons.get(from.concat(from_hash));
+			ServerListener t = cons.get(to);
+			ServerListener n = cons.get(from.concat(from_hash));
 			if(t != null){
 				try{
 					//Statement stmt = conn.createStatement();
@@ -358,7 +358,7 @@ public class DatabaseHandlerServer implements ClientListener{
 			}
 		}//end if
 		else{
-			ToClient t = cons.get(from.concat(from_hash));
+			ServerListener t = cons.get(from.concat(from_hash));
 			t.error("Your not authentic!");
 		}
 	}//end getIP
@@ -412,13 +412,13 @@ public class DatabaseHandlerServer implements ClientListener{
 				ResultSet s = stmt.executeQuery();
 				if(s.next()) {
 					String test = s.getString(1);
-					ToClient t = cons.get(to.concat(test));
+					ServerListener t = cons.get(to.concat(test));
 					t.rejectedConverstation(from);
 				}
 
 			}//end if
 			else{
-				ToClient t = cons.get(from.concat(from_hash));
+				ServerListener t = cons.get(from.concat(from_hash));
 				t.error("You are not authentic!");
 			}
 		}//end try
@@ -434,13 +434,14 @@ public class DatabaseHandlerServer implements ClientListener{
 	 *
 	 * @param from      user who wants to remove
 	 * @param from_hash - verify user
-	 * @param friend    - friend to remove.
+	 * @param to - friend to remove.
 	 * @throws IOException
 	 */
 	@Override
-	public synchronized void requestRemoveFriend(String from, String from_hash, String friend) throws IOException {
+	public synchronized void requestRemoveFriend(String from, String from_hash, String to) throws IOException {
 		if(check(from, from_hash)){
-			ToClient t = null;
+			ServerListener t = null;
+			cons.get(from.concat(from_hash)).removeFriend(from,to);
 			try{
 				PreparedStatement stmt = conn.prepareStatement("SELECT HASH FROM USERS WHERE USER=?;");
 				stmt.setString(1, to);
@@ -457,10 +458,9 @@ public class DatabaseHandlerServer implements ClientListener{
 			//client isn't online
 			if(t == null){
 				try{
-					PreparedStatement stmt = conn.prepareStatement("INSERT INTO messages VALUES(?,?,?);");
-					stmt.setString(1, from + " " + to + " " + status );
+					PreparedStatement stmt = conn.prepareStatement("INSERT INTO messages VALUES(?,?,'remove');");
+					stmt.setString(1, from + " " + to);
 					stmt.setString(2, to);
-                    stmt.setString(3,"remove");
 					stmt.execute();
 				}//end try
 				catch(SQLException e){
@@ -475,9 +475,9 @@ public class DatabaseHandlerServer implements ClientListener{
 			}//end
 		}//end if
 		else{
-			ToClient t = cons.get(to.concat(from_hash));
+			ServerListener t = cons.get(to.concat(from_hash));
 			System.out.println(cons);
-			t.error("Your not authentic!");
+			t.error("Your are not authentic!");
 		}
 
 	}

@@ -45,7 +45,7 @@ public class DatabaseHandlerClient {
             //This tells it to use the h2 driver
             Class.forName("org.h2.Driver");
             //creates the connection
-            if ( !new File(path).exists() ) return;
+            if ( !new File(path).exists() ) throw new SQLException();
             if(path.endsWith("/")) {
                 conn = DriverManager.getConnection("jdbc:h2:" + path + user + ";CIPHER=AES", user, "filepwd " + password);
             }else{
@@ -161,7 +161,7 @@ public class DatabaseHandlerClient {
 			try{
 				//Statement stmt = conn.createStatement();
                 //stmt.execute("DELETE * FROM friends WHERE name = '" + name + "';");
-                PreparedStatement stmt = conn.prepareStatement("DELETE * FROM friends WHERE name=?;");
+                PreparedStatement stmt = conn.prepareStatement("DELETE FROM friends WHERE name=?;");
                 stmt.setString(1, name);
                 stmt.execute();
             }//end try

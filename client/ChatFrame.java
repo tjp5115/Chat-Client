@@ -46,6 +46,7 @@ public class ChatFrame implements ServerListener, PeerListener
         messagePanel = new HashMap<>();
         peerListener = new HashMap<>();
         this.managerClient = managerClient;
+        frame = new JFrame("Chat Client Login");
         createLoginFrame();
         frame.setVisible(true);
         frame.setResizable(false);
@@ -82,18 +83,21 @@ public class ChatFrame implements ServerListener, PeerListener
      * creates and sets the current frame to the login frame of the gui
      */
     public void createLoginFrame(){
-        frame = new JFrame("Chat Client Login");
+        if(registerPanel != null)
+            frame.remove(registerPanel);
         frame.setSize(400, 200);
         loginPanel = new LoginPanel(this);
         frame.add(loginPanel);
-
+        frame.revalidate();
+        frame.repaint();
     }
 
     /**
      * creates and sets the current frame to the register new user frame of the gui
      */
     public void createRegisterFrame(){
-        frame.remove(loginPanel);
+        if(loginPanel != null)
+            frame.remove(loginPanel);
         frame.setSize(400, 230);
         registerPanel = new RegisterPanel(this);
         frame.add(registerPanel);
@@ -107,11 +111,9 @@ public class ChatFrame implements ServerListener, PeerListener
     public void createDefaultChatFrame(){
         if (registerPanel != null){
             frame.remove(registerPanel);
-        }else if(loginPanel != null){
+        }
+        if(loginPanel != null){
             frame.remove(loginPanel);
-        }else{
-            System.err.println("CreateDefaultChatFrame Call with no login or register panel, Hope you are debugging");
-            frame = new JFrame();
         }
 
         frame.setTitle("Chat Client: " + dbHandler.getName());
@@ -197,7 +199,7 @@ public class ChatFrame implements ServerListener, PeerListener
             managerClient.run();
             String hash = registerPanel.getPassword();
             hash = dbHandler.getPasswordHash(hash);
-            String ip = managerClient.getUserIP();
+            String ip = getIP();
             String username = registerPanel.getUsername();
             clientListener.createAccount(ip,
                     username,
@@ -409,7 +411,7 @@ public class ChatFrame implements ServerListener, PeerListener
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
-            dbHandler.init(user, managerClient.getServerIP());
+            dbHandler.init(user, getIP());
             loginSuccess();
         } else
             JOptionPane.showMessageDialog(null, "Username is taken, select a new one.",
@@ -447,14 +449,21 @@ public class ChatFrame implements ServerListener, PeerListener
     public void removeFriend(String requester, String friend) {
         if(requester.equals(dbHandler.getName())){
             friendPanel.removeFriend(friend);
+            dbHandler.updateFriend(friend, false);
         }else{
             JOptionPane.showConfirmDialog(null, requester + " has removed you as a friend.",
                     "Friend Removal.",
                     JOptionPane.PLAIN_MESSAGE);
             friendPanel.removeFriend(requester);
+            dbHandler.updateFriend(requester, false);
         }
         frame.revalidate();
         frame.repaint();
+    }
+
+    @Override
+    public String getIP() {
+        return managerClient.getUserIP();
     }
 
     public void requestRemoveFriend(String friend){

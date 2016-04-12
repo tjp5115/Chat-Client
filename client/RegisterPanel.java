@@ -23,7 +23,7 @@ import java.util.Arrays;
 
 */
 public class RegisterPanel extends JPanel{
-    private JButton createUserButton, filePathButton;
+    private JButton createUserButton, filePathButton, back;
     private JLabel userLabel, passwordLabel, IPLabel;
     private JTextField userText, databaseText, IPText;
     private JPasswordField passwordText;
@@ -75,7 +75,6 @@ public class RegisterPanel extends JPanel{
 
         databaseText = new JTextField(20);
         databaseText.setText("Database File Directory");
-        databaseText.setText("C:\\Users\\Crystal\\Documents");
         databaseText.setBounds(100, 100, 260, 25);
         add(databaseText);
 
@@ -84,7 +83,7 @@ public class RegisterPanel extends JPanel{
         createUserButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(databaseText.getText().isEmpty() ||
+                if (databaseText.getText().isEmpty() ||
                         IPText.getText().isEmpty() ||
                         passwordText.getPassword().length == 0 ||
                         userText.getText().isEmpty()) {
@@ -92,11 +91,21 @@ public class RegisterPanel extends JPanel{
                             "Fields are Empty.",
                             "Error",
                             JOptionPane.ERROR_MESSAGE);
-                }else {
+                } else {
                     chatFrame.registerUsername();
                 }
             }
         });
+
+        back = new JButton("Back");
+        back.setBounds(200, 140, 80, 25);
+        back.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                chatFrame.createLoginFrame();
+            }
+        });
+        add(back);
         add(createUserButton);
     }
 

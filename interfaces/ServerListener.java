@@ -80,5 +80,7 @@ public interface ServerListener {
      * @param requester - the user who requested the remove
      * @param friend - the friend that was removed.
      */
-    void removeFriend(String requester, String friend);
+    void removeFriend(String requester, String friend) throws IOException;
+
+    String getIP();
 }
