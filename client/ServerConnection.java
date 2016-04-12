@@ -188,7 +188,11 @@ public class ServerConnection implements ClientListener{
      */
     @Override
     public void requestRemoveFriend(String from, String from_hash, String friend) throws IOException {
-
+        out.writeByte('M');
+        out.writeUTF(from);
+        out.writeUTF(from_hash);
+        out.writeUTF(friend);
+        out.flush();
     }
 
     /**
@@ -254,8 +258,10 @@ public class ServerConnection implements ClientListener{
                             serverListener.loginSuccess();
                             break;
                         case 'M':
-                            // todo remove friend.
-                            //serverListener.removeFriend();
+                            from = in.readUTF();
+                            to = in.readUTF();
+                            serverListener.removeFriend(from, to);
+                            break;
                         default:
                             System.err.println ("Bad message: " + b);
                             break;

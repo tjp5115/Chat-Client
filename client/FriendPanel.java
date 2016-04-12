@@ -16,6 +16,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /* Left panel for the ChatFrame gui. Has a list of friends, and can the buttons to init a chat.
 
@@ -30,10 +31,9 @@ public class FriendPanel extends JPanel {
     private JPanel friendsPanel;
     private JPanel options;
     private ChatFrame chatFrame;
-    private ArrayList<String> friends;
+    private HashMap<String,FriendButton> friends;
     Dimension buttonSize;
     FriendPanel(ChatFrame cf, Dimension dim, ArrayList<String> friends){
-        this.friends = friends;
 
         chatFrame = cf;
         setPreferredSize(dim);
@@ -70,6 +70,18 @@ public class FriendPanel extends JPanel {
         options.add(addFriend);
 
         JButton remove = new JButton("Remove Friend");
+        remove.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String s = JOptionPane.showInputDialog(null,
+                        "What friend to remove?",
+                        "Remove Friend",
+                        JOptionPane.PLAIN_MESSAGE);
+                if ((s!=null)){
+                    chatFrame.requestRemoveFriend(s);
+                }
+            }
+        });
         remove.setPreferredSize(buttonSize);
         options.add(remove);
         options.setPreferredSize(optionsDim);
@@ -80,7 +92,16 @@ public class FriendPanel extends JPanel {
     }
 
     public void addFriend(String friend){
-        friendsPanel.add(new FriendButton(friend, buttonSize));
+        FriendButton fb = new FriendButton(friend, buttonSize);
+        friends.put(friend,fb);
+        friendsPanel.add(fb);
+    }
+
+    public void removeFriend(String friend){
+        friendsPanel.remove(friends.get(friend));
+        friendsPanel.revalidate();
+        friendsPanel.repaint();
+        friends.remove(friend);
     }
 
     class FriendButton extends JButton{

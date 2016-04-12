@@ -139,16 +139,6 @@ public class ChatFrame implements ServerListener, PeerListener
         frame.revalidate();
         frame.repaint();
     }
-    /**
-     * removes a user from the chatframe map and panel
-     * @param user
-     */
-    private void clearChatFrame(String user){
-        frame.remove(messagePanel.get(user));
-        messagePanel.remove(user);
-        frame.revalidate();
-        frame.repaint();
-    }
 
     /**
      * When a user click the username to either bring up the chat window, or create a chat connection with another user.
@@ -455,7 +445,31 @@ public class ChatFrame implements ServerListener, PeerListener
      */
     @Override
     public void removeFriend(String requester, String friend) {
-
+        if(requester.equals(dbHandler.getName())){
+            friendPanel.removeFriend(friend);
+        }else{
+            JOptionPane.showConfirmDialog(null, requester + " has removed you as a friend.",
+                    "Friend Removal.",
+                    JOptionPane.PLAIN_MESSAGE);
+            friendPanel.removeFriend(requester);
+        }
+        frame.revalidate();
+        frame.repaint();
     }
 
+    public void requestRemoveFriend(String friend){
+       if(dbHandler.isFriend(friend))
+           try {
+               clientListener.requestRemoveFriend(dbHandler.getName(),dbHandler.getHash(),friend);
+           } catch (IOException e) {
+               JOptionPane.showMessageDialog(null, "Error connecting to server.",
+                       "Error",
+                       JOptionPane.ERROR_MESSAGE);
+           }
+       else{
+           JOptionPane.showMessageDialog(null, friend + " is not your friend.",
+                   "Error",
+                   JOptionPane.ERROR_MESSAGE);
+       }
+    }
 }
