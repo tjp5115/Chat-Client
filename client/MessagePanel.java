@@ -39,12 +39,15 @@ public class MessagePanel extends JPanel{
         messageText = new JTextArea(6,27);
         messageText.setBorder(BorderFactory.createLineBorder(Color.black));
         messageText.setLineWrap(true);
+        JScrollPane messageScrollPane = new JScrollPane(messageText);
+
         sendMessage = new JButton("Send");
         sendMessage.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
                     chatFrame.message(user, friend, messageText.getText());
+                    messageText.setText("");
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
@@ -56,8 +59,8 @@ public class MessagePanel extends JPanel{
         send = new JPanel();
         send.setLayout(new FlowLayout());
         send.setPreferredSize(new Dimension(w, h));
-        send.add(messageText);
         send.add(sendMessage);
+        send.add(messageScrollPane);
         add(send, BorderLayout.SOUTH);
 
 
@@ -83,7 +86,8 @@ public class MessagePanel extends JPanel{
         messageText.setColumns(26);
         messageText.setText(message);
         messageText.setEditable(false);
-        messageText.setSize(messageWidth-20,Short.MAX_VALUE);
+        messageText.setSize(messageWidth - 30, Short.MAX_VALUE);
+
         messagePanel.add(messageText);
         messagePanel.setPreferredSize(new Dimension(messageWidth, messageText.getPreferredSize().height));
 
@@ -96,6 +100,10 @@ public class MessagePanel extends JPanel{
         }
 
         messages.add(messagePanel);
+        JScrollBar vertical = messagesScrollPane.getVerticalScrollBar();
+        vertical.setValue(vertical.getMaximum());
+        messagesScrollPane.revalidate();
+        messagesScrollPane.repaint();
         messages.revalidate();
         messages.repaint();
         revalidate();

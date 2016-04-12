@@ -108,10 +108,12 @@ public class DatabaseHandlerServer implements ClientListener{
 		if(check(from, from_hash)){
 			ToClient t = null;
 			try{
-				Statement stmt = conn.createStatement();
-				String sql = "SELECT HASH FROM USERS WHERE USER='" + to + "\';";
-				//System.out.println("SQL: "+sql);
-				ResultSet s = stmt.executeQuery(sql);
+				//Statement stmt = conn.createStatement();
+				//String sql = "SELECT HASH FROM USERS WHERE USER='" + to + "\';";
+				//ResultSet s = stmt.executeQuery(sql);
+				PreparedStatement stmt = conn.prepareStatement("SELECT HASH FROM USERS WHERE USER=?;");
+				stmt.setString(1, to);
+				ResultSet s = stmt.executeQuery();
 				if(s.next()) {
 					String test = s.getString(1);
 					t = cons.get(to.concat(test));
@@ -124,11 +126,14 @@ public class DatabaseHandlerServer implements ClientListener{
 			//client isn't online
 			if(t == null){
 				try{
-					Statement stmt = conn.createStatement();
-					String m = "'" + from + " " + to + " " + status + "'";
-					String sql = "INSERT INTO messages VALUES(" + m + ",'"+ to +"');";
-					//System.out.println("SQL: "+sql);
-					stmt.execute(sql);
+					//Statement stmt = conn.createStatement();
+					//String sql = "INSERT INTO messages VALUES(" + m + ",'"+ to +"');";
+					//stmt.execute(sql);
+
+					PreparedStatement stmt = conn.prepareStatement("INSERT INTO messages VALUES(?,?);");
+					stmt.setString(1, from + " " + to + " " + status );
+					stmt.setString(2, to);
+					stmt.execute();
 				}//end try
 				catch(SQLException e){
 					System.out.println("error friend request");
@@ -159,8 +164,11 @@ public class DatabaseHandlerServer implements ClientListener{
 		boolean c = false;
 		//check to see if username is already used
 		try{
-			Statement stmt = conn.createStatement();
-			ResultSet s = stmt.executeQuery("SELECT USER FROM USERS WHERE USER=\'" + username + "\';");
+			//Statement stmt = conn.createStatement();
+			//ResultSet s = stmt.executeQuery("SELECT USER FROM USERS WHERE USER=\'" + username + "\';");
+			PreparedStatement stmt = conn.prepareStatement("SELECT USER FROM USERS WHERE USER=?;");
+			stmt.setString(1, username);
+			ResultSet s = stmt.executeQuery();
 			if(!s.next()){
 				c = true;
 			}
@@ -179,9 +187,14 @@ public class DatabaseHandlerServer implements ClientListener{
 		if(c){
 			//adding user
 			try{
-				Statement stmt = conn.createStatement();
-				String sql = "INSERT INTO users VALUES('"+username+"', '"+ip+"', TRUE, '" + username_hash + "');";
-				stmt.execute(sql);
+				//Statement stmt = conn.createStatement();
+				//String sql = "INSERT INTO users VALUES('"+username+"', '"+ip+"', TRUE, '" + username_hash + "');";
+				//stmt.execute(sql);
+				PreparedStatement stmt = conn.prepareStatement("INSERT INTO users VALUES(?,?,TRUE,?)");
+				stmt.setString(1, username);
+				stmt.setString(2, ip);
+				stmt.setString(3, username_hash);
+				stmt.execute();
 			}//end try
 			catch(SQLException e){
 				System.out.println("error createaccount");
@@ -208,12 +221,17 @@ public class DatabaseHandlerServer implements ClientListener{
 			ToClient t = cons.get(user.concat(user_hash));
 			t.loginSuccess();
 			try{
-				Statement stmt = conn.createStatement();
-				stmt.execute("UPDATE users " +
-					"SET IP='" + t.getIP() +"', ONLINE=TRUE"
-					+ " WHERE USER='" + user + "';");
+				//Statement stmt = conn.createStatement();
+				//stmt.execute("UPDATE users " +"SET IP='" + t.getIP() +"', ONLINE=TRUE"+ " WHERE USER='" + user + "';");
+				//ResultSet s = stmt.executeQuery("SELECT MESSAGE FROM MESSAGES WHERE USER=\'" + user + "\';");
+				PreparedStatement stmt = conn.prepareStatement("UPDATE users SET IP=?, ONLINE=TRUE WHERE USER=?;");
+				stmt.setString(1, t.getIP());
+				stmt.setString(2, user);
+				stmt.execute();
 
-				ResultSet s = stmt.executeQuery("SELECT MESSAGE FROM MESSAGES WHERE USER=\'" + user + "\';");
+				stmt = conn.prepareStatement("SELECT MESSAGE FROM MESSAGES WHERE USER=?;");
+				stmt.setString(1, user);
+				ResultSet s = stmt.executeQuery();
 				while(s.next()){
 					String m = s.getString(1);
 					m.replaceAll("_", " ");
@@ -239,9 +257,12 @@ public class DatabaseHandlerServer implements ClientListener{
     public synchronized void logoff(String user, String user_hash) throws IOException{
 		if(check(user,user_hash)){
 			try{
-				Statement stmt = conn.createStatement();
-				String sql = "UPDATE users SET IP='0.0.0.0', ONLINE=FALSE WHERE USER='"+ user + "';";
-				stmt.execute(sql);
+				//Statement stmt = conn.createStatement();
+				//String sql = "UPDATE users SET IP='0.0.0.0', ONLINE=FALSE WHERE USER='"+ user + "';";
+				//stmt.execute(sql);
+				PreparedStatement stmt = conn.prepareStatement("UPDATE users SET IP='0.0.0.0', ONLINE=FALSE WHERE USER=?;");
+				stmt.setString(1, user);
+				stmt.execute();
 			}//end try
 			catch(SQLException e){
 				System.out.println("error logoff");
@@ -267,8 +288,12 @@ public class DatabaseHandlerServer implements ClientListener{
 		if(check(from,from_hash)){
 			ToClient t = null;
 			try{
-				Statement stmt = conn.createStatement();
-				ResultSet s = stmt.executeQuery("SELECT HASH FROM USERS WHERE USER='" + to + "';");
+				//Statement stmt = conn.createStatement();
+				//ResultSet s = stmt.executeQuery("SELECT HASH FROM USERS WHERE USER='" + to + "';");
+
+				PreparedStatement stmt = conn.prepareStatement("SELECT HASH FROM USERS WHERE USER=?;");
+				stmt.setString(1, to);
+				ResultSet s = stmt.executeQuery();
 				if(s.next()) {
 					t = cons.get(to.concat(s.getString(1)));
 				}
@@ -304,10 +329,14 @@ public class DatabaseHandlerServer implements ClientListener{
 			ToClient n = cons.get(from.concat(from_hash));
 			if(t != null){
 				try{
-					Statement stmt = conn.createStatement();
-					String sql = "SELECT IP FROM USERS WHERE USER='" + to + "';";
+					//Statement stmt = conn.createStatement();
+					//String sql = "SELECT IP FROM USERS WHERE USER='" + to + "';";
 					//System.out.println(sql);
-					ResultSet s = stmt.executeQuery(sql);
+					//ResultSet s = stmt.executeQuery(sql);
+
+					PreparedStatement stmt = conn.prepareStatement("SELECT IP FROM USERS WHERE USER=?");
+					stmt.setString(1, to);
+					ResultSet s = stmt.executeQuery();
 					if(s.next()) {
 						n.IP(to, s.getString(1));
 					}else{
@@ -339,8 +368,11 @@ public class DatabaseHandlerServer implements ClientListener{
 	private synchronized boolean check(String name, String hash){
 		boolean ans = false;
 		try{
-			Statement stmt = conn.createStatement();
-			ResultSet s = stmt.executeQuery("SELECT HASH FROM USERS WHERE USER='" + name + "';");
+			//Statement stmt = conn.createStatement();
+			//ResultSet s = stmt.executeQuery("SELECT HASH FROM USERS WHERE USER='" + name + "';");
+			PreparedStatement stmt = conn.prepareStatement("SELECT HASH FROM USERS WHERE USER=?;");
+			stmt.setString(1, name);
+			ResultSet s = stmt.executeQuery();
 			if(s.next()) {
 				//s.beforeFirst();
 				ans = hash.equals(s.getString(1));
@@ -368,8 +400,11 @@ public class DatabaseHandlerServer implements ClientListener{
     public void rejectConversation(String from, String from_hash, String to) throws IOException{
 		try{
 			if(check(from,from_hash)){
-				Statement stmt = conn.createStatement();
-				ResultSet s = stmt.executeQuery("SELECT HASH FROM USERS WHERE USER='" + to + "';");
+				//Statement stmt = conn.createStatement();
+				//ResultSet s = stmt.executeQuery("SELECT HASH FROM USERS WHERE USER='" + to + "';");
+				PreparedStatement stmt = conn.prepareStatement("SELECT HASH FROM USERS WHERE USER=?;");
+				stmt.setString(1, to);
+				ResultSet s = stmt.executeQuery();
 				if(s.next()) {
 					String test = s.getString(1);
 					ToClient t = cons.get(to.concat(test));

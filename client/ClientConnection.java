@@ -25,7 +25,7 @@ import java.net.Socket;
 public class ClientConnection implements PeerListener{
 
     private Socket sok;
-    //private SSLServerSocket ssok;
+    private ServerSocket serverSocket;
     private PeerListener peerListener;
     private DataOutputStream out;
     private DataInputStream in;
@@ -47,23 +47,17 @@ public class ClientConnection implements PeerListener{
 
     public ClientConnection(ServerSocket serverSocket, PeerListener peerListener, String to) throws IOException{
         this.peerListener = peerListener;
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    sok = serverSocket.accept();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-        if(sok != null) {
-            peerListener.start(to);
-            out = new DataOutputStream(sok.getOutputStream());
-            in = new DataInputStream(sok.getInputStream());
-            serverSocket.close();
-            new ReaderThread().start();
-        }
+        this.serverSocket = serverSocket;
+        sok = serverSocket.accept();
+        serverSocket.close();
+        peerListener.start(to);
+        out = new DataOutputStream(sok.getOutputStream());
+        in = new DataInputStream(sok.getInputStream());
+        new ReaderThread().start();
+    }
+
+    public boolean isClosed(){
+        return sok.isClosed();
     }
 
     /**
@@ -115,6 +109,8 @@ public class ClientConnection implements PeerListener{
         out.writeByte('Q');
         out.writeUTF(user);
         out.flush();
+        if(serverSocket != null)
+            serverSocket.close();
     }
 
     /**
@@ -169,6 +165,8 @@ public class ClientConnection implements PeerListener{
                 try
                 {
                     sok.close();
+                    if(serverSocket != null)
+                        serverSocket.close();
                 }
                 catch (IOException exc)
                 {

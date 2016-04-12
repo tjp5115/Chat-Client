@@ -8,6 +8,7 @@
 *  $Log$
 */
 
+import org.h2.command.Prepared;
 import org.h2.tools.ChangeFileEncryption;
 
 import java.io.File;
@@ -44,6 +45,7 @@ public class DatabaseHandlerClient {
             //This tells it to use the h2 driver
             Class.forName("org.h2.Driver");
             //creates the connection
+            if ( !new File(path).exists() ) return;
             if(path.endsWith("/")) {
                 conn = DriverManager.getConnection("jdbc:h2:" + path + user + ";CIPHER=AES", user, "filepwd " + password);
             }else{
@@ -101,8 +103,11 @@ public class DatabaseHandlerClient {
     public boolean isFriend(String username){
 		boolean t = false;
 		try{
-			Statement stmt = conn.createStatement();
-            ResultSet s = stmt.executeQuery("SELECT name FROM friends WHERE NAME='" + username + "';");
+			//Statement stmt = conn.createStatement();
+            //ResultSet s = stmt.executeQuery("SELECT name FROM friends WHERE NAME='" + username + "';");
+            PreparedStatement stmt = conn.prepareStatement("SELECT name FROM friends WHERE NAME=?;");
+            stmt.setString(1,username);
+            ResultSet s = stmt.executeQuery();
 			if (s.next()){
 				t = true;
 			}
@@ -119,8 +124,11 @@ public class DatabaseHandlerClient {
     */
     public void addFriend(String name){
         try{
-            Statement stmt = conn.createStatement();
-            stmt.execute("INSERT INTO friends VALUES('" + name + "', 0);");
+            //Statement stmt = conn.createStatement();
+            //stmt.execute("INSERT INTO friends VALUES('" + name + "', 0);");
+            PreparedStatement stmt = conn.prepareStatement("INSERT INTO friends VALUES(?,0);");
+            stmt.setString(1, name);
+            stmt.execute();
         }//end try
         catch(SQLException e){
             System.out.println("error adding friend");
@@ -136,8 +144,11 @@ public class DatabaseHandlerClient {
     public void updateFriend(String name, boolean t){
 		if(t){
 			try{
-				Statement stmt = conn.createStatement();
-                stmt.execute("UPDATE friends SET status = 1 WHERE name='" + name+ "';");
+				//Statement stmt = conn.createStatement();
+                //stmt.execute("UPDATE friends SET status = 1 WHERE name='" + name+ "';");
+                PreparedStatement stmt = conn.prepareStatement("UPDATE friends SET status = 1 WHERE name=?;");
+                stmt.setString(1, name);
+                stmt.execute();
 			}//end try
 			catch(SQLException e){
 				System.out.println("error updating friend");
@@ -146,9 +157,12 @@ public class DatabaseHandlerClient {
 		}
 		else{
 			try{
-				Statement stmt = conn.createStatement();
-                stmt.execute("DELETE * FROM friends WHERE name = '" + name + "';");
-			}//end try
+				//Statement stmt = conn.createStatement();
+                //stmt.execute("DELETE * FROM friends WHERE name = '" + name + "';");
+                PreparedStatement stmt = conn.prepareStatement("DELETE * FROM friends WHERE name=?;");
+                stmt.setString(1, name);
+                stmt.execute();
+            }//end try
 			catch(SQLException e){
 				System.out.println("error updating friend");
 				e.printStackTrace();

@@ -47,18 +47,19 @@ public class ChatFrame implements ServerListener, PeerListener
         this.managerClient = managerClient;
         createLoginFrame();
         frame.setVisible(true);
+        frame.setResizable(false);
         frame.addWindowListener(new WindowAdapter()
         {
             @Override
             public void windowClosing(WindowEvent e)
             {
                 try {
-                    clientListener.logoff(dbHandler.getName(), dbHandler.getHash());
+                    if(clientListener != null)
+                        clientListener.logoff(dbHandler.getName(), dbHandler.getHash());
                     for(String f: messagePanel.keySet())
                         stop(f);
                     System.exit(0);
-                }catch(IOException ioe){
-                    System.err.println("i dont think you will see this. Error while closed.");
+                }catch (Exception E){
                 }
                 e.getWindow().dispose();
             }
@@ -177,7 +178,7 @@ public class ChatFrame implements ServerListener, PeerListener
             if (!dbHandler.isConnected()){
                 dbHandler = null;
                 JOptionPane.showMessageDialog(null,
-                        "Error connecting to database, Check filepath.",
+                        "Error connecting to database.",
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
                 return;
@@ -230,11 +231,17 @@ public class ChatFrame implements ServerListener, PeerListener
      */
     @Override
     public void message(String from, String to, String msg) throws IOException {
-        if(from.equals(dbHandler.getName())){
+        if(to.equals(dbHandler.getName())){
+
+            messagePanel.get(from).addMessage(from, msg);
+        }else if (peerListener.get(to).isClosed()){
+            JOptionPane.showConfirmDialog(null, to + " has left the conversation.",
+                    "friend request",
+                    JOptionPane.PLAIN_MESSAGE);
+            frame.remove(messagePanel.get(to));
+        }else{
             messagePanel.get(to).addMessage(from, msg);
             peerListener.get(to).message(from,to,msg);
-        }else{
-            messagePanel.get(from).addMessage(from, msg);
         }
 
         frame.revalidate();
@@ -259,6 +266,11 @@ public class ChatFrame implements ServerListener, PeerListener
     @Override
     public void stop(String user) throws IOException {
         clearChatFrame(user);
+    }
+
+    @Override
+    public boolean isClosed() {
+        return false;
     }
 
 

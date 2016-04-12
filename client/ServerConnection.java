@@ -228,7 +228,7 @@ public class ServerConnection implements ClientListener{
                         case 'C':
                             username = in.readUTF();
                             status = in.readByte();
-                            System.out.println("<-- S " + username + " " + status );
+                            System.out.println("<-- C " + username + " " + status );
                             serverListener.createAccountResponse(username, status);
                             break;
                         case 'Z':
