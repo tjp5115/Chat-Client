@@ -65,7 +65,7 @@ public class DatabaseHandlerServer implements ClientListener{
 		try{
 			Statement stmt = conn.createStatement();
 			stmt.execute("CREATE TABLE users(USER VARCHAR(255) PRIMARY KEY, IP VARCHAR(25), ONLINE BOOLEAN, HASH VARCHAR(255));");
-			stmt.execute("CREATE TABLE messages(MESSAGE VARCHAR(255), USER VARCHAR(255), FOREIGN KEY(USER) REFERENCES USERS);");
+			stmt.execute("CREATE TABLE messages(MESSAGE VARCHAR(255), USER VARCHAR(255), TYPE VARCHAR(255), FOREIGN KEY(USER) REFERENCES USERS);");
 		}//end try
 		catch(SQLException e){
 			System.out.println("error creating tables");
@@ -130,9 +130,10 @@ public class DatabaseHandlerServer implements ClientListener{
 					//String sql = "INSERT INTO messages VALUES(" + m + ",'"+ to +"');";
 					//stmt.execute(sql);
 
-					PreparedStatement stmt = conn.prepareStatement("INSERT INTO messages VALUES(?,?);");
+					PreparedStatement stmt = conn.prepareStatement("INSERT INTO messages VALUES(?,?,?);");
 					stmt.setString(1, from + " " + to + " " + status );
 					stmt.setString(2, to);
+                    stmt.setString(3, "friend");
 					stmt.execute();
 				}//end try
 				catch(SQLException e){
@@ -187,9 +188,6 @@ public class DatabaseHandlerServer implements ClientListener{
 		if(c){
 			//adding user
 			try{
-				//Statement stmt = conn.createStatement();
-				//String sql = "INSERT INTO users VALUES('"+username+"', '"+ip+"', TRUE, '" + username_hash + "');";
-				//stmt.execute(sql);
 				PreparedStatement stmt = conn.prepareStatement("INSERT INTO users VALUES(?,?,TRUE,?)");
 				stmt.setString(1, username);
 				stmt.setString(2, ip);
@@ -221,21 +219,28 @@ public class DatabaseHandlerServer implements ClientListener{
 			ToClient t = cons.get(user.concat(user_hash));
 			t.loginSuccess();
 			try{
-				//Statement stmt = conn.createStatement();
-				//stmt.execute("UPDATE users " +"SET IP='" + t.getIP() +"', ONLINE=TRUE"+ " WHERE USER='" + user + "';");
-				//ResultSet s = stmt.executeQuery("SELECT MESSAGE FROM MESSAGES WHERE USER=\'" + user + "\';");
 				PreparedStatement stmt = conn.prepareStatement("UPDATE users SET IP=?, ONLINE=TRUE WHERE USER=?;");
 				stmt.setString(1, t.getIP());
 				stmt.setString(2, user);
 				stmt.execute();
 
-				stmt = conn.prepareStatement("SELECT MESSAGE FROM MESSAGES WHERE USER=?;");
+				stmt = conn.prepareStatement("SELECT MESSAGE FROM MESSAGES WHERE USER=? AND TYPE=?;");
 				stmt.setString(1, user);
+                stmt.setString(2,"friend");
 				ResultSet s = stmt.executeQuery();
 				while(s.next()){
 					String m = s.getString(1);
 					m.replaceAll("_", " ");
 					t.userFriendStatus(m);
+				}//end while
+				stmt = conn.prepareStatement("SELECT MESSAGE FROM MESSAGES WHERE USER=? AND TYPE=?;");
+				stmt.setString(1, user);
+                stmt.setString(2,"remove");
+			    s = stmt.executeQuery();
+				while(s.next()){
+					String m = s.getString(1);
+					m.replaceAll("_", " ");
+					t.removeFriend(m);
 				}//end while
 			}//end try
 			catch(SQLException e){
@@ -397,7 +402,7 @@ public class DatabaseHandlerServer implements ClientListener{
      * @param from -- who rejected
      * @param to -- to
      */
-    public void rejectConversation(String from, String from_hash, String to) throws IOException{
+    public synchronized void rejectConversation(String from, String from_hash, String to) throws IOException{
 		try{
 			if(check(from,from_hash)){
 				//Statement stmt = conn.createStatement();
@@ -433,7 +438,47 @@ public class DatabaseHandlerServer implements ClientListener{
 	 * @throws IOException
 	 */
 	@Override
-	public void requestRemoveFriend(String from, String from_hash, String friend) throws IOException {
+	public synchronized void requestRemoveFriend(String from, String from_hash, String friend) throws IOException {
+		if(check(from, from_hash)){
+			ToClient t = null;
+			try{
+				PreparedStatement stmt = conn.prepareStatement("SELECT HASH FROM USERS WHERE USER=?;");
+				stmt.setString(1, to);
+				ResultSet s = stmt.executeQuery();
+				if(s.next()) {
+					String test = s.getString(1);
+					t = cons.get(to.concat(test));
+				}
+			}//end try
+			catch(SQLException e){
+				System.out.println("error remove friend");
+				e.printStackTrace();
+			}//end catch
+			//client isn't online
+			if(t == null){
+				try{
+					PreparedStatement stmt = conn.prepareStatement("INSERT INTO messages VALUES(?,?,?);");
+					stmt.setString(1, from + " " + to + " " + status );
+					stmt.setString(2, to);
+                    stmt.setString(3,"remove");
+					stmt.execute();
+				}//end try
+				catch(SQLException e){
+					System.out.println("error friend request");
+					e.printStackTrace();
+				}//end catch
+			}//end if
+
+			//if client is online
+			else{
+				t.removeFriend(from, to);
+			}//end
+		}//end if
+		else{
+			ToClient t = cons.get(to.concat(from_hash));
+			System.out.println(cons);
+			t.error("Your not authentic!");
+		}
 
 	}
 

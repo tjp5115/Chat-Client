@@ -147,6 +147,19 @@ public class ToClient implements ServerListener{
 
 	}
 
+
+
+
+	/**
+	 * Message that requests a user remove the friend
+	 *
+	 * @param String - message
+	 * 
+	 */
+	@Override
+	public void removeFriend(String message) {
+
+	}
 	/**
      * initiate a conversation between two clients
      * @param from - initiator
