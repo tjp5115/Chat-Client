@@ -49,8 +49,8 @@ public class ClientConnection implements PeerListener{
     public ClientConnection(ServerSocket serverSocket, PeerListener peerListener, String to) throws IOException{
         this.serverSocket = serverSocket;
         this.peerListener = peerListener;
-        peerListener.start(to);
         sok = serverSocket.accept();
+        peerListener.start(to);
         out = new DataOutputStream (sok.getOutputStream());
         in = new DataInputStream (sok.getInputStream());
         new ReaderThread().start();

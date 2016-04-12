@@ -38,7 +38,7 @@ public class MessagePanel extends JPanel{
 
         messageText = new JTextArea(6,27);
         messageText.setBorder(BorderFactory.createLineBorder(Color.black));
-
+        messageText.setLineWrap(true);
         sendMessage = new JButton("Send");
         sendMessage.addActionListener(new ActionListener() {
             @Override
@@ -55,7 +55,7 @@ public class MessagePanel extends JPanel{
         int h = (int)(dim.height * .2);
         send = new JPanel();
         send.setLayout(new FlowLayout());
-        send.setPreferredSize(new Dimension(w,h));
+        send.setPreferredSize(new Dimension(w, h));
         send.add(messageText);
         send.add(sendMessage);
         add(send, BorderLayout.SOUTH);
@@ -68,6 +68,8 @@ public class MessagePanel extends JPanel{
                 ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         messagesScrollPane.setPreferredSize(messagesDim);
+        JScrollBar vertical = messagesScrollPane.getVerticalScrollBar();
+        vertical.setValue(vertical.getMaximum());
         add(messagesScrollPane, BorderLayout.NORTH);
 
 
@@ -94,9 +96,9 @@ public class MessagePanel extends JPanel{
         }
 
         messages.add(messagePanel);
-        messages.invalidate();
+        messages.revalidate();
         messages.repaint();
-        invalidate();
+        revalidate();
         repaint();
 
 

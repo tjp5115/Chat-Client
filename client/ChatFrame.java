@@ -160,11 +160,13 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
         if(dbHandler == null){
             dbHandler = new DatabaseHandlerClient(loginPanel.getPath(), loginPanel.getUsername(), loginPanel.getPassword());
             if (!dbHandler.isConnected()){
+                dbHandler = null;
                 JOptionPane.showMessageDialog(null,
                         "Error connecting to database, Check filepath.",
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
                 return;
+
             }
         }
         try {
@@ -217,10 +219,10 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
             messagePanel.get(to).addMessage(from, msg);
             peerListener.get(to).message(from,to,msg);
         }else{
-            messagePanel.get(from).addMessage(to, msg);
+            messagePanel.get(from).addMessage(from, msg);
         }
 
-        frame.invalidate();
+        frame.revalidate();
         frame.repaint();
     }
 
@@ -331,7 +333,7 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
      */
     @Override
     public void initConversation(String from, String to, String port) throws IOException {
-        //if(!dbHandler.isFriend(from)) return;
+        if(!dbHandler.isFriend(from)) return;
         int dialogButton = JOptionPane.YES_NO_OPTION;
         int dialogResult = JOptionPane.showConfirmDialog(null, "Do you want to start a conversation with " + from,
                 "Init chat conversation",
@@ -371,8 +373,8 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
      * @param user - 'friend' who rejected.
      */
     @Override
-    public void rejectedConverstaion(String user) throws IOException {
-        peerListener.get(user).stop(user);
+    public void rejectedConverstation(String user) throws IOException {
+        dbHandler.updateFriend(user, false);
     }
 
     /**

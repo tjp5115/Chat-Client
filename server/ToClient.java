@@ -164,7 +164,7 @@ public class ToClient implements ServerListener{
      * a client has reject your conversation
      * @param user - 'friend' who rejected.
      */
-    public void rejectedConverstaion(String user) throws IOException{
+    public void rejectedConverstation(String user) throws IOException{
 		out.writeByte('Z');
 		out.writeUTF(user);
 		out.flush();

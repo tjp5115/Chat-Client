@@ -34,7 +34,6 @@ public class DatabaseHandlerClient {
     String hash;
     HashMap<String,String> ip;
     HashMap<String,String> port;
-    private String user;
     /*Default constructor
     @parm: String - path to database file
     @parm: String - username
@@ -49,8 +48,7 @@ public class DatabaseHandlerClient {
                 conn = DriverManager.getConnection("jdbc:h2:" + path + user + ";CIPHER=AES", user, "filepwd " + password);
             }else{
                 path = path.substring(0,path.length()-6);
-                conn = DriverManager.getConnection("jdbc:h2:file:" + path + ";CIPHER=AES;IFEXISTS=TRUE;USER="+user+";", user,  "filepwd " + password);
-                this.user = user;
+                conn = DriverManager.getConnection("jdbc:h2:file:" + path + ";CIPHER=AES;IFEXISTS=TRUE;", user,  "filepwd " + password);
                 /*
                 new Thread(new Runnable() {
                     @Override
@@ -104,9 +102,9 @@ public class DatabaseHandlerClient {
 		boolean t = false;
 		try{
 			Statement stmt = conn.createStatement();
-            ResultSet s = stmt.executeQuery("SELECT name FROM friends WHERE NAME=" + username + ";");
+            ResultSet s = stmt.executeQuery("SELECT name FROM friends WHERE NAME='" + username + "';");
 			if (s.next()){
-				t = false;
+				t = true;
 			}
         }//end try
         catch(SQLException e){
@@ -207,7 +205,6 @@ public class DatabaseHandlerClient {
 
 	*/
 	public String getName(){
-        /*
 		String ans = "";
 		try{
 			Statement stmt = conn.createStatement();
@@ -221,28 +218,15 @@ public class DatabaseHandlerClient {
             e.printStackTrace();
         }//end catch
         return ans;
-        */
-        return user;
 	}//end
 
     /**
      * get the hash of the user
      * @return hash
      */
-    //todo
     public String getHash(){
 		return hash;
 	}//end get
-
-    /**
-     * update friend up
-     * @param username - username of friend
-     * @param ip - ip of friend;
-     */
-    public void updateFriendIP(String username, String ip){
-		this.ip.remove(username);
-		this.ip.put(username, ip);
-    }
 
     /**
      * Gets the IP of a user

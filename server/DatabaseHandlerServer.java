@@ -144,7 +144,7 @@ public class DatabaseHandlerServer implements ClientListener{
 		else{
 			ToClient t = cons.get(to.concat(from_hash));
 			System.out.println(cons);
-			t.error("Your not authehtic!");
+			t.error("Your not authentic!");
 		}
 	}//end friend
 
@@ -373,7 +373,7 @@ public class DatabaseHandlerServer implements ClientListener{
 				ResultSet s = stmt.executeQuery("SELECT HASH FROM USERS WHERE UESR=\'" + to + "\';");
 				String test = s.getString(1);
 				ToClient t = cons.get(to.concat(test));
-				t.rejectedConverstaion(from);
+				t.rejectedConverstation(from);
 
 			}//end if
 			else{

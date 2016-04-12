@@ -226,7 +226,7 @@ public class ServerConnection implements ClientListener{
                             break;
                         case 'Z':
                             from = in.readUTF();
-                            serverListener.rejectedConverstaion(from);
+                            serverListener.rejectedConverstation(from);
                             break;
                         case 'R':
                             serverListener.loginSuccess();
