@@ -45,6 +45,7 @@ public class DatabaseHandlerServer implements ClientListener{
 			e.printStackTrace();
 		}//end catch
 		init();
+		/*
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -55,6 +56,7 @@ public class DatabaseHandlerServer implements ClientListener{
 				}
 			}
 		}).start();
+		*/
 	}//end constructor
 
 
