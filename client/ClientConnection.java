@@ -26,7 +26,6 @@ public class ClientConnection implements PeerListener{
 
     private Socket sok;
     //private SSLServerSocket ssok;
-    private ServerSocket serverSocket;
     private PeerListener peerListener;
     private DataOutputStream out;
     private DataInputStream in;
@@ -47,13 +46,24 @@ public class ClientConnection implements PeerListener{
     }
 
     public ClientConnection(ServerSocket serverSocket, PeerListener peerListener, String to) throws IOException{
-        this.serverSocket = serverSocket;
         this.peerListener = peerListener;
-        sok = serverSocket.accept();
-        peerListener.start(to);
-        out = new DataOutputStream (sok.getOutputStream());
-        in = new DataInputStream (sok.getInputStream());
-        new ReaderThread().start();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    sok = serverSocket.accept();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+        if(sok != null) {
+            peerListener.start(to);
+            out = new DataOutputStream(sok.getOutputStream());
+            in = new DataInputStream(sok.getInputStream());
+            serverSocket.close();
+            new ReaderThread().start();
+        }
     }
 
     /**
@@ -91,6 +101,7 @@ public class ClientConnection implements PeerListener{
     public void start(String user) throws IOException {
         out.writeByte('S');
         out.writeUTF(user);
+        System.out.println("--> S " + user);
         out.flush();
     }
 
@@ -101,13 +112,9 @@ public class ClientConnection implements PeerListener{
      */
     @Override
     public void stop(String user) throws IOException {
-        if(serverSocket != null){
-            serverSocket.close();
-        }else {
-            out.writeByte('Q');
-            out.writeUTF(user);
-            out.flush();
-        }
+        out.writeByte('Q');
+        out.writeUTF(user);
+        out.flush();
     }
 
     /**
@@ -140,10 +147,12 @@ public class ClientConnection implements PeerListener{
                             break;
                         case 'S':
                             username = in.readUTF();
+                            System.out.println("<-- S " + username);
                             peerListener.stop(username);
                             break;
                         case 'Q':
                             username = in.readUTF();
+                            System.out.println("<-- Q " + username );
                             peerListener.stop(username);
                             break;
                         default:

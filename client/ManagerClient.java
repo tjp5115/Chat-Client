@@ -25,6 +25,7 @@ import java.net.Socket;
 class ManagerClient
 {
 	private ChatFrame GUI;
+	//todo need to be able to specify this.
 	private String SERVER_HOST;
 	private int SERVER_PORT = 5432;
 	private ServerConnection serverConnection;
@@ -65,7 +66,6 @@ class ManagerClient
 		//create SSL Socket to other ip
 		//SSLSocketFactory sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
 		PeerListener peer = null;
-
 		try
 		{
 			//SSLSocket c = (SSLSocket) sf.createSocket(_ip, Integer.parseInt(_port));

@@ -60,6 +60,7 @@ public class ServerConnection implements ClientListener{
         out.writeUTF(from_hash);
         out.writeUTF(to);
         out.writeByte(status);
+        System.out.println("--> F " + from + " " +from_hash + " " + to  + " " + status);
         out.flush();
     }
 
@@ -87,6 +88,7 @@ public class ServerConnection implements ClientListener{
         out.writeUTF(ip);
         out.writeUTF(username);
         out.writeUTF(username_hash);
+        System.out.println("--> R " + ip + " " + username + " " + username_hash );
         out.flush();
     }
 
@@ -102,6 +104,7 @@ public class ServerConnection implements ClientListener{
         out.writeByte('J');
         out.writeUTF(user);
         out.writeUTF(user_hash);
+        System.out.println("--> J " + user + " " + user_hash);
         out.flush();
     }
 
@@ -117,6 +120,7 @@ public class ServerConnection implements ClientListener{
         out.writeByte('Q');
         out.writeUTF(user);
         out.writeUTF(user_hash);
+        System.out.println("--> Q " + user + " " + user_hash);
         out.flush();
     }
 
@@ -135,7 +139,7 @@ public class ServerConnection implements ClientListener{
         out.writeUTF(from_hash);
         out.writeUTF(to);
         out.writeUTF(port);
-        System.out.println("--> S "+ from + " " + from_hash + " " + to + " " + port);
+        System.out.println("--> S " + from + " " + from_hash + " " + to + " " + port);
         out.flush();
     }
 
@@ -153,7 +157,7 @@ public class ServerConnection implements ClientListener{
         out.writeUTF(from);
         out.writeUTF(from_hash);
         out.writeUTF(to);
-        System.out.println("--> G "+ from + " " + from_hash + " " + to);
+        System.out.println("--> G " + from + " " + from_hash + " " + to);
         out.flush();
     }
 
@@ -170,6 +174,7 @@ public class ServerConnection implements ClientListener{
         out.writeUTF(from);
         out.writeUTF(from_hash);
         out.writeUTF(to);
+        System.out.println("--> Z " + from + " " + from_hash + " " + to);
         out.flush();
     }
 
@@ -199,7 +204,7 @@ public class ServerConnection implements ClientListener{
                             from = in.readUTF();
                             to = in.readUTF();
                             status = in.readByte();
-                            //System.out.println("<-- F " + from + " " + to + " " + status);
+                            System.out.println("<-- F " + from + " " + to + " " + status);
                             serverListener.userFriendStatus(from, to, status);
                             break;
                         case 'G':
@@ -210,6 +215,7 @@ public class ServerConnection implements ClientListener{
                             break;
                         case 'E':
                             error = in.readUTF();
+                            System.out.println("<-- E " + error);
                             serverListener.error(error);
                             break;
                         case 'S':
@@ -222,13 +228,16 @@ public class ServerConnection implements ClientListener{
                         case 'C':
                             username = in.readUTF();
                             status = in.readByte();
+                            System.out.println("<-- S " + username + " " + status );
                             serverListener.createAccountResponse(username, status);
                             break;
                         case 'Z':
                             from = in.readUTF();
+                            System.out.println("<-- Z " + from );
                             serverListener.rejectedConverstation(from);
                             break;
                         case 'R':
+                            System.out.println("<-- R " );
                             serverListener.loginSuccess();
                             break;
                         default:

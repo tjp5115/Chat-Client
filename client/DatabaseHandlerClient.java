@@ -137,7 +137,7 @@ public class DatabaseHandlerClient {
 		if(t){
 			try{
 				Statement stmt = conn.createStatement();
-                stmt.execute("UPDATE friends SET status = 1 WHERE name=\'" + name+ "\';");
+                stmt.execute("UPDATE friends SET status = 1 WHERE name='" + name+ "';");
 			}//end try
 			catch(SQLException e){
 				System.out.println("error updating friend");
@@ -147,7 +147,7 @@ public class DatabaseHandlerClient {
 		else{
 			try{
 				Statement stmt = conn.createStatement();
-                stmt.execute("DELETE * FROM friends WHERE name = \'" + name + "\';");
+                stmt.execute("DELETE * FROM friends WHERE name = '" + name + "';");
 			}//end try
 			catch(SQLException e){
 				System.out.println("error updating friend");

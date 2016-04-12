@@ -189,8 +189,8 @@ public class DatabaseHandlerServer implements ClientListener{
 			}//end catch
 			cons.remove(ip);
 			cons.put(username, t);
-			cons.put(username.concat(username_hash),t);
-			t.createAccountResponse(username,1);
+			cons.put(username.concat(username_hash), t);
+			t.createAccountResponse(username, 1);
 		}//end if
 		else{//rejected
 			t.createAccountResponse(username,0);
@@ -240,9 +240,8 @@ public class DatabaseHandlerServer implements ClientListener{
 		if(check(user,user_hash)){
 			try{
 				Statement stmt = conn.createStatement();
-				stmt.execute("UPDATE users " +
-					"SET IP=\"0.0.0.0\", ONLINE=FALSE"
-					+ " WHERE USER=" + user + ";");
+				String sql = "UPDATE users SET IP='0.0.0.0', ONLINE=FALSE WHERE USER='"+ user + "';";
+				stmt.execute(sql);
 			}//end try
 			catch(SQLException e){
 				System.out.println("error logoff");
@@ -370,10 +369,12 @@ public class DatabaseHandlerServer implements ClientListener{
 		try{
 			if(check(from,from_hash)){
 				Statement stmt = conn.createStatement();
-				ResultSet s = stmt.executeQuery("SELECT HASH FROM USERS WHERE UESR=\'" + to + "\';");
-				String test = s.getString(1);
-				ToClient t = cons.get(to.concat(test));
-				t.rejectedConverstation(from);
+				ResultSet s = stmt.executeQuery("SELECT HASH FROM USERS WHERE USER='" + to + "';");
+				if(s.next()) {
+					String test = s.getString(1);
+					ToClient t = cons.get(to.concat(test));
+					t.rejectedConverstation(from);
+				}
 
 			}//end if
 			else{

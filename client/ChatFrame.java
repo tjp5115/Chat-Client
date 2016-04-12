@@ -13,6 +13,7 @@
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
@@ -26,7 +27,7 @@ import java.util.HashMap;
 @emails: stl7199@rit.edu, tjp5115@rit.edu, lxl3375@rit.edu
 
 */
-public class ChatFrame implements ServerListener, PeerListener, WindowListener
+public class ChatFrame implements ServerListener, PeerListener
 {
     private DatabaseHandlerClient dbHandler;
     private LoginPanel loginPanel;
@@ -45,9 +46,23 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
         peerListener = new HashMap<>();
         this.managerClient = managerClient;
         createLoginFrame();
-        //createDefaultChatFrame();
         frame.setVisible(true);
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.addWindowListener(new WindowAdapter()
+        {
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                try {
+                    clientListener.logoff(dbHandler.getName(), dbHandler.getHash());
+                    for(String f: messagePanel.keySet())
+                        stop(f);
+                    System.exit(0);
+                }catch(IOException ioe){
+                    System.err.println("i dont think you will see this. Error while closed.");
+                }
+                e.getWindow().dispose();
+            }
+        });
         messageDim = new Dimension(380, 700);
     }
     ChatFrame(){
@@ -273,7 +288,7 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
                 frame.repaint();
             } else {
                 //no
-                clientListener.friendRequest(to, dbHandler.getHash(), from, 0);
+                clientListener.friendRequest(to, dbHandler.getHash(), from, 2);
             }
         }else if(status == 1){
             JOptionPane.showConfirmDialog(null, from + " accepted you as a friend.",
@@ -308,7 +323,7 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
         }else{
             peerListener.put(user,
                     managerClient.createClientConnection(dbHandler.getFriendIP(user),
-                    Integer.parseInt(dbHandler.getFriendPort(user))));
+                            Integer.parseInt(dbHandler.getFriendPort(user))));
             start(user);
         }
     }
@@ -340,8 +355,10 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
                 dialogButton);
         if(dialogResult == 0) {
             //yes
-            dbHandler.addFriendPort(from,port);
-            clientListener.getIP(to,dbHandler.getHash(),from);
+            dbHandler.addFriendPort(from, port);
+            clientListener.getIP(to, dbHandler.getHash(), from);
+        }else{
+            clientListener.rejectConversation(to, dbHandler.getHash(), from);
         }
     }
 
@@ -374,7 +391,9 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
      */
     @Override
     public void rejectedConverstation(String user) throws IOException {
-        dbHandler.updateFriend(user, false);
+        JOptionPane.showConfirmDialog(null, user + " declined the conversation.",
+                "Conversation Response.",
+                JOptionPane.PLAIN_MESSAGE);
     }
 
     /**
@@ -385,34 +404,4 @@ public class ChatFrame implements ServerListener, PeerListener, WindowListener
         createDefaultChatFrame();
     }
 
-    //start of WindowListener interface
-    public void windowOpened(WindowEvent e) {}
-
-    public void windowClosing(WindowEvent e) {}
-
-    /**
-     * Invoked when a window has been closed as the result
-     * of calling dispose on the window.
-     *
-     * @param e
-     */
-    @Override
-    public void windowClosed(WindowEvent e) {
-        try {
-            clientListener.logoff(dbHandler.getName(), dbHandler.getHash());
-            for(String f: messagePanel.keySet())
-                stop(f);
-            System.exit(0);
-        }catch(IOException ioe){
-            System.err.println("i dont think you will see this. Error while closed.");
-        }
-    }
-
-    public void windowIconified(WindowEvent e) {}
-
-    public void windowDeiconified(WindowEvent e) {}
-
-    public void windowActivated(WindowEvent e) {}
-
-    public void windowDeactivated(WindowEvent e) {}
 }

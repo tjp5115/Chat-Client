@@ -85,6 +85,7 @@ public class ToClient implements ServerListener{
 		out.writeUTF(from);
 		out.writeUTF(to);
 		out.writeByte(status);
+		System.out.println("--> F " + from + " " + to + " " + status);
 		out.flush();
 	}//end user
 
@@ -108,8 +109,8 @@ public class ToClient implements ServerListener{
     public void IP(String user, String IP) throws IOException{
 		out.writeByte ('G');
 		out.writeUTF(user);
-		//out.writeUTF(user_hash);
 		out.writeUTF(IP);
+		System.out.println("--> G " + user + " " + IP);
 		out.flush();
 	}//end ip
 
@@ -121,6 +122,7 @@ public class ToClient implements ServerListener{
     public void error(String error) throws IOException{
 		out.writeByte('E');
 		out.writeUTF(error);
+		System.out.println("--> E " + error);
 		out.flush();
 	}//end error
 
@@ -130,6 +132,7 @@ public class ToClient implements ServerListener{
      */
     public void loginSuccess() throws IOException {
 		out.writeByte('R');
+		System.out.println("--> R " );
 		out.flush();
 	}//end
 
@@ -144,7 +147,7 @@ public class ToClient implements ServerListener{
 		out.writeUTF(from);
 		out.writeUTF(to);
 		out.writeUTF(port);
-		System.out.println("--> S " + from+ " " + to + " " + port);
+		System.out.println("--> S " + from + " " + to + " " + port);
 		out.flush();
 	}
 
@@ -157,6 +160,7 @@ public class ToClient implements ServerListener{
 		out.writeByte ('C');
 		out.writeUTF(user);
 		out.writeByte(status);
+		System.out.println("--> C " + user + " " + status );
 		out.flush();
 	}//end
 
@@ -167,11 +171,9 @@ public class ToClient implements ServerListener{
     public void rejectedConverstation(String user) throws IOException{
 		out.writeByte('Z');
 		out.writeUTF(user);
+		System.out.println("--> Z " + user + " " );
 		out.flush();
 	}
-
-
-
 
 	/**
 	 * Class ReaderThread receives messages from the network, decodes them, and
@@ -207,20 +209,21 @@ public class ToClient implements ServerListener{
 							ip = in.readUTF();
 							username = in.readUTF();
 							hash = in.readUTF();
-							//System.out.println(ip + " " + username + " " + hash );
+							System.out.println("<-- R " + ip + " " + username + " " + hash );
 							clientListener.add(ip, toc);
 							clientListener.createAccount(ip, username, hash);
 							break;
 						case 'J':
 							username = in.readUTF();
 							hash = in.readUTF();
-							//System.out.println(username + " " + hash );
+							System.out.println("<-- J " + username + " " + hash );
 							clientListener.add(username, hash, toc);
 							clientListener.logon(username, hash);
 							break;
 						case 'Q':
 							username = in.readUTF();
 							hash = in.readUTF();
+							System.out.println("<-- Q " + username + " " + hash );
 							clientListener.logoff(username, hash);
 							break;
 						case 'S':
@@ -237,6 +240,13 @@ public class ToClient implements ServerListener{
 							to = in.readUTF();
 							System.out.println("<-- G " + from+ " " + hash+ " " + to);
 							clientListener.getIP(from, hash, to);
+							break;
+						case 'Z':
+							from = in.readUTF();
+							hash = in.readUTF();
+							to = in.readUTF();
+							System.out.println("<-- Z " + from+ " " + hash+ " " + to);
+							clientListener.rejectConversation(from, hash, to);
 							break;
 						default:
 							System.err.println ("Bad message");
