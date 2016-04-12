@@ -136,7 +136,18 @@ public class ToClient implements ServerListener{
 		out.flush();
 	}//end
 
-    /**
+	/**
+	 * Message that requests a user remove the friend
+	 *
+	 * @param requester - the user who requested the remove
+	 * @param friend    - the friend that was removed.
+	 */
+	@Override
+	public void removeFriend(String requester, String friend) {
+
+	}
+
+	/**
      * initiate a conversation between two clients
      * @param from - initiator
 	 * @param to - responder
@@ -247,6 +258,10 @@ public class ToClient implements ServerListener{
 							to = in.readUTF();
 							System.out.println("<-- Z " + from+ " " + hash+ " " + to);
 							clientListener.rejectConversation(from, hash, to);
+							break;
+						case 'M':
+							// todo remove friend.
+							//clientListener.requestRemoveFriend();
 							break;
 						default:
 							System.err.println ("Bad message");

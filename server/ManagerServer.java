@@ -51,7 +51,6 @@ class ManagerServer
 			{
 				//receive any SSLsocket
 				Socket clientSocket = serverSocket.accept();
-				System.out.println("Accepted.");
 				//create ToClient object and gives it the SSL socket
 				new ToClient(clientSocket, dbHandler);
 			}

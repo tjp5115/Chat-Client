@@ -424,5 +424,18 @@ public class DatabaseHandlerServer implements ClientListener{
 
 	}//end
 
+	/**
+	 * Request to remove the friend
+	 *
+	 * @param from      user who wants to remove
+	 * @param from_hash - verify user
+	 * @param friend    - friend to remove.
+	 * @throws IOException
+	 */
+	@Override
+	public void requestRemoveFriend(String from, String from_hash, String friend) throws IOException {
+
+	}
+
 
 }//end class

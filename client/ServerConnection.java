@@ -179,6 +179,19 @@ public class ServerConnection implements ClientListener{
     }
 
     /**
+     * Request to remove the friend
+     *
+     * @param from      user who wants to remove
+     * @param from_hash - verify user
+     * @param friend    - friend to remove.
+     * @throws IOException
+     */
+    @Override
+    public void requestRemoveFriend(String from, String from_hash, String friend) throws IOException {
+
+    }
+
+    /**
      * Class ReaderThread receives messages from the network, decodes them, and
      * invokes the proper methods to process them.
      *
@@ -240,6 +253,9 @@ public class ServerConnection implements ClientListener{
                             System.out.println("<-- R " );
                             serverListener.loginSuccess();
                             break;
+                        case 'M':
+                            // todo remove friend.
+                            //serverListener.removeFriend();
                         default:
                             System.err.println ("Bad message: " + b);
                             break;

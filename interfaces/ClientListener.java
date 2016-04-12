@@ -108,4 +108,13 @@ public interface ClientListener {
      */
     public void rejectConversation(String from, String from_hash, String to) throws IOException;
 
+    /**
+     * Request to remove the friend
+     * @param from user who wants to remove
+     * @param from_hash - verify user
+     * @param friend - friend to remove.
+     * @throws IOException
+     */
+    void requestRemoveFriend(String from, String from_hash, String friend) throws IOException;
+
 }

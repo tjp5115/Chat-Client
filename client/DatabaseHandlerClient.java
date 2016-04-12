@@ -40,7 +40,7 @@ public class DatabaseHandlerClient {
     @parm: String - username
     @parm: String - user password
     */
-    public DatabaseHandlerClient(String path, String user, String password){
+    public DatabaseHandlerClient(String path, String user, String password) throws SQLException{
         try {
             //This tells it to use the h2 driver
             Class.forName("org.h2.Driver");
@@ -69,7 +69,7 @@ public class DatabaseHandlerClient {
         	ip = new HashMap<String,String>();
             port = new HashMap<String,String>();
         }//end try
-        catch (SQLException | ClassNotFoundException e) {
+        catch (ClassNotFoundException e) {
             System.out.println("error creating the conn for database");
             e.printStackTrace();
         }//end catch

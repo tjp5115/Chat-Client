@@ -18,6 +18,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -174,15 +175,15 @@ public class ChatFrame implements ServerListener, PeerListener
      */
     public void logon(){
         if(dbHandler == null){
-            dbHandler = new DatabaseHandlerClient(loginPanel.getPath(), loginPanel.getUsername(), loginPanel.getPassword());
-            if (!dbHandler.isConnected()){
+            try {
+                dbHandler = new DatabaseHandlerClient(loginPanel.getPath(), loginPanel.getUsername(), loginPanel.getPassword());
+            } catch (SQLException e) {
                 dbHandler = null;
                 JOptionPane.showMessageDialog(null,
                         "Error connecting to database.",
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
                 return;
-
             }
         }
         try {
@@ -228,7 +229,10 @@ public class ChatFrame implements ServerListener, PeerListener
         try {
             clientListener.friendRequest(dbHandler.getName(),dbHandler.getHash(),username,0);
         } catch (IOException e) {
-            System.err.println("Error with friend request. User request: "+ username);
+            JOptionPane.showMessageDialog(null,
+                    "Server error while making friend request.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -405,9 +409,16 @@ public class ChatFrame implements ServerListener, PeerListener
     @Override
     public void createAccountResponse(String user, int status) throws IOException {
         if(status == 1) {
-            dbHandler = new DatabaseHandlerClient(registerPanel.getPath()+"/",
-                    registerPanel.getUsername(),
-                    registerPanel.getPassword());
+            try {
+                dbHandler = new DatabaseHandlerClient(registerPanel.getPath()+"/",
+                        registerPanel.getUsername(),
+                        registerPanel.getPassword());
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null,
+                        "Error connecting to database.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
             dbHandler.init(user, managerClient.getServerIP());
             loginSuccess();
         } else
@@ -434,6 +445,17 @@ public class ChatFrame implements ServerListener, PeerListener
     @Override
     public void loginSuccess() throws IOException {
         createDefaultChatFrame();
+    }
+
+    /**
+     * Message that requests a user remove the friend
+     *
+     * @param requester - the user who requested the remove
+     * @param friend    - the friend that was removed.
+     */
+    @Override
+    public void removeFriend(String requester, String friend) {
+
     }
 
 }
