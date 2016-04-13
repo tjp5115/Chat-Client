@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.sql.*;
 
 /* This class handles all requests from the clients, it also
-makes the nessitary SQL calls to the database. Before you can use anymethods the toClient
+makes the nessitary SQL calls to the database. Before you can use any methods the ServerListener
 That is making the calls needs to add its self to this class through the add method!
 
 @authors: Samuel Launt, Tyler Paulsen, LAI CHUNG Lau
@@ -81,7 +81,7 @@ public class DatabaseHandlerServer implements ClientListener{
 		@parm: Toclient the conection to user
 
 	*/
-	public synchronized void add(String name, String hash, ToClient c){
+	public synchronized void add(String name, String hash, ServerListener c){
 		cons.put(name.concat(hash),c);
 	}//end add
 
@@ -90,7 +90,7 @@ public class DatabaseHandlerServer implements ClientListener{
 		@parm: Toclient the conection to user
 
 	*/
-	public synchronized void add(String ip, ToClient c){
+	public synchronized void add(String ip, ServerListener c){
 		cons.put(ip,c);
 	}//end add
 
