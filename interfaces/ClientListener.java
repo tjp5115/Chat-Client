@@ -43,7 +43,7 @@ public interface ClientListener {
 		@parm: Toclient the conection to user
 
 	*/
-	public void add(String name, String hash, ToClient c);
+	public void add(String name, String hash, ServerListener c);
 
 
 
@@ -52,7 +52,7 @@ public interface ClientListener {
 		@parm: Toclient the conection to user
 
 	*/
-	public void add(String ip, ToClient c);
+	public void add(String ip, ServerListener c);
 
 
 

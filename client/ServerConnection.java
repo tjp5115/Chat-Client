@@ -65,12 +65,12 @@ public class ServerConnection implements ClientListener{
     }
 
     @Override
-    public void add(String name, String hash, ToClient c) {
+    public void add(String name, String hash, ServerListener c) {
 
     }
 
     @Override
-    public void add(String ip, ToClient c) {
+    public void add(String ip, ServerListener c) {
 
     }
 
