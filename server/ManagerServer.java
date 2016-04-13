@@ -25,11 +25,18 @@ class ManagerServer
 {
 	private DatabaseHandlerServer dbHandler;
 	private int port;
+    private boolean debug;
 
 	public ManagerServer(int port)
 	{
 		this.port = port;
+        debug = false;
 	}
+
+    public ManagerServer(int port, boolean b){
+        this.port = port;
+        debug = b;
+    }
 
 	public void setDatabaseHandler(DatabaseHandlerServer dh)
 	{
@@ -52,7 +59,7 @@ class ManagerServer
 				//receive any SSLsocket
 				Socket clientSocket = serverSocket.accept();
 				//create ToClient object and gives it the SSL socket
-				new ToClient(clientSocket, dbHandler);
+				new ToClient(clientSocket, dbHandler, debug);
 			}
 		} catch (IOException e) {
 			System.err.println("IOException in Server manager");

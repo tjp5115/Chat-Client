@@ -24,14 +24,31 @@ class Server
 	{
 		//create database handler and manager
 		DatabaseHandlerServer db = new DatabaseHandlerServer();
-		ManagerServer manager = new ManagerServer(PORT);
+        ManagerServer manager = null;
+        if(args.length == 0){
+		    manager = new ManagerServer(PORT,false);
+        }//end if 
+        else if(args.length == 1){
+            if(args[0].equals("true")){
+                manager = new ManagerServer(PORT,true);   
+            }
+            else if(args[0].equals("false")){
+                manager = new ManagerServer(PORT,false);
+            }
+            else{
+                usage();
+            }
+        }
+        else{
+            usage();
+        }
 		manager.setDatabaseHandler(db);
 		manager.run();
 	}
 
 	private static void usage()
 	{
-		System.err.println("Usage: java Server <host_address> <port>");
+		System.err.println("Usage: java Server [<debug(true/false)>]");
 		throw new IllegalArgumentException();
 	}
 }
