@@ -24,10 +24,17 @@ https://github.com/blstrrifl/chat
 Running the Program
 -------------------
 
+NOTE: This program was made is java 8 and any other java versions are not garenteed 
+to work!
+
 To run the server, the user must be in a unix environemnt,  navigate to 
 the server directory and use the following command:
 
 ./run.sh <ip of the server>
+
+The server is using a in memory database so if the server goes down all users must 
+regrister. This can be changed to a file database easily, but has not been implimented.
+It will however be fixed in the next version.
 
 This command will compile the server and run it on the IP specified.
 

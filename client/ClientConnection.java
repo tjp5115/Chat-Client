@@ -109,8 +109,13 @@ public class ClientConnection implements PeerListener{
         out.writeByte('Q');
         out.writeUTF(user);
         out.flush();
-        if(serverSocket != null)
+        if(serverSocket != null){
             serverSocket.close();
+        }
+        if(sok != null){
+            sok.close();
+        }
+
     }
 
     /**

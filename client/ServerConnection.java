@@ -122,6 +122,7 @@ public class ServerConnection implements ClientListener{
         out.writeUTF(user_hash);
         System.out.println("--> Q " + user + " " + user_hash);
         out.flush();
+        sok.close();
     }
 
     /**
