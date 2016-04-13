@@ -26,6 +26,7 @@ public class ServerConnection implements ClientListener{
     private ServerListener serverListener;
     private DataOutputStream out;
     private DataInputStream in;
+    private boolean debugMode;
 
     /**
      * constructor for the server connection
@@ -38,6 +39,16 @@ public class ServerConnection implements ClientListener{
         out = new DataOutputStream (sok.getOutputStream());
         in = new DataInputStream (sok.getInputStream());
         serverListener = _serverListener;
+        debugMode = false;
+        new ReaderThread().start();
+    }
+
+    public ServerConnection(SSLSocket _sok, ServerListener _serverListener, boolean debug)throws IOException{
+        sok = _sok;
+        out = new DataOutputStream (sok.getOutputStream());
+        in = new DataInputStream (sok.getInputStream());
+        serverListener = _serverListener;
+        debugMode = debug;
         new ReaderThread().start();
     }
 
@@ -59,7 +70,7 @@ public class ServerConnection implements ClientListener{
         out.writeUTF(from_hash);
         out.writeUTF(to);
         out.writeByte(status);
-        System.out.println("--> F " + from + " " +from_hash + " " + to  + " " + status);
+        debugPrint("--> F " + from + " " +from_hash + " " + to  + " " + status);
         out.flush();
     }
 
@@ -87,7 +98,7 @@ public class ServerConnection implements ClientListener{
         out.writeUTF(ip);
         out.writeUTF(username);
         out.writeUTF(username_hash);
-        System.out.println("--> R " + ip + " " + username + " " + username_hash );
+        debugPrint("--> R " + ip + " " + username + " " + username_hash);
         out.flush();
     }
 
@@ -103,7 +114,7 @@ public class ServerConnection implements ClientListener{
         out.writeByte('J');
         out.writeUTF(user);
         out.writeUTF(user_hash);
-        System.out.println("--> J " + user + " " + user_hash);
+        debugPrint("--> J " + user + " " + user_hash);
         out.flush();
     }
 
@@ -119,7 +130,7 @@ public class ServerConnection implements ClientListener{
         out.writeByte('Q');
         out.writeUTF(user);
         out.writeUTF(user_hash);
-        System.out.println("--> Q " + user + " " + user_hash);
+        debugPrint("--> Q " + user + " " + user_hash);
         out.flush();
     }
 
@@ -138,7 +149,7 @@ public class ServerConnection implements ClientListener{
         out.writeUTF(from_hash);
         out.writeUTF(to);
         out.writeUTF(port);
-        System.out.println("--> S " + from + " " + from_hash + " " + to + " " + port);
+        debugPrint("--> S " + from + " " + from_hash + " " + to + " " + port);
         out.flush();
     }
 
@@ -156,7 +167,7 @@ public class ServerConnection implements ClientListener{
         out.writeUTF(from);
         out.writeUTF(from_hash);
         out.writeUTF(to);
-        System.out.println("--> G " + from + " " + from_hash + " " + to);
+        debugPrint("--> G " + from + " " + from_hash + " " + to);
         out.flush();
     }
 
@@ -173,7 +184,7 @@ public class ServerConnection implements ClientListener{
         out.writeUTF(from);
         out.writeUTF(from_hash);
         out.writeUTF(to);
-        System.out.println("--> Z " + from + " " + from_hash + " " + to);
+        debugPrint("--> Z " + from + " " + from_hash + " " + to);
         out.flush();
     }
 
@@ -192,6 +203,14 @@ public class ServerConnection implements ClientListener{
         out.writeUTF(from_hash);
         out.writeUTF(friend);
         out.flush();
+    }
+
+    public void debugPrint(Stirng message)
+    {
+        if(debugMode)
+        {
+            System.out.println(message);
+        }
     }
 
     /**
@@ -220,40 +239,40 @@ public class ServerConnection implements ClientListener{
                             from = in.readUTF();
                             to = in.readUTF();
                             status = in.readByte();
-                            System.out.println("<-- F " + from + " " + to + " " + status);
+                            debugPrint("<-- F " + from + " " + to + " " + status);
                             serverListener.userFriendStatus(from, to, status);
                             break;
                         case 'G':
                             username = in.readUTF();
                             ip = in.readUTF();
-                            System.out.println("<-- G " + username + " " + ip);
+                            debugPrint("<-- G " + username + " " + ip);
                             serverListener.IP(username, ip);
                             break;
                         case 'E':
                             error = in.readUTF();
-                            System.out.println("<-- E " + error);
+                            debugPrint("<-- E " + error);
                             serverListener.error(error);
                             break;
                         case 'S':
                             from = in.readUTF();
                             to = in.readUTF();
                             String port = in.readUTF();
-                            System.out.println("<-- S " + from + " " + to + " " + port);
+                            debugPrint("<-- S " + from + " " + to + " " + port);
                             serverListener.initConversation(from,to, port);
                             break;
                         case 'C':
                             username = in.readUTF();
                             status = in.readByte();
-                            System.out.println("<-- C " + username + " " + status );
+                            debugPrint("<-- C " + username + " " + status);
                             serverListener.createAccountResponse(username, status);
                             break;
                         case 'Z':
                             from = in.readUTF();
-                            System.out.println("<-- Z " + from );
+                            debugPrint("<-- Z " + from);
                             serverListener.rejectedConverstation(from);
                             break;
                         case 'R':
-                            System.out.println("<-- R " );
+                            debugPrint("<-- R ");
                             serverListener.loginSuccess();
                             break;
                         case 'M':

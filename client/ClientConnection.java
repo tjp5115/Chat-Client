@@ -29,6 +29,7 @@ public class ClientConnection implements PeerListener{
     private PeerListener peerListener;
     private DataOutputStream out;
     private DataInputStream in;
+    private boolean debugMode;
 
     /**
      * constructor for the server connection
@@ -42,6 +43,7 @@ public class ClientConnection implements PeerListener{
         out = new DataOutputStream (sok.getOutputStream());
         in = new DataInputStream (sok.getInputStream());
         this.peerListener = peerListener;
+        debugMode = false;
         new ReaderThread().start();
     }
 
@@ -51,6 +53,29 @@ public class ClientConnection implements PeerListener{
         sok = serverSocket.accept();
         serverSocket.close();
         peerListener.start(to);
+        debugMode = false;
+        out = new DataOutputStream(sok.getOutputStream());
+        in = new DataInputStream(sok.getInputStream());
+        new ReaderThread().start();
+    }
+
+    public ClientConnection(SSLSocket sok, PeerListener peerListener, boolean debug) throws IOException
+    {
+        this.sok = sok;
+        out = new DataOutputStream (sok.getOutputStream());
+        in = new DataInputStream (sok.getInputStream());
+        this.peerListener = peerListener;
+        debugMode = debug;
+        new ReaderThread().start();
+    }
+
+    public ClientConnection(SSLServerSocket serverSocket, PeerListener peerListener, String to, boolean debug) throws IOException{
+        this.peerListener = peerListener;
+        this.serverSocket = serverSocket;
+        sok = serverSocket.accept();
+        serverSocket.close();
+        peerListener.start(to);
+        debugMode = debug;
         out = new DataOutputStream(sok.getOutputStream());
         in = new DataInputStream(sok.getInputStream());
         new ReaderThread().start();
@@ -82,7 +107,7 @@ public class ClientConnection implements PeerListener{
         out.writeUTF(from);
         out.writeUTF(to);
         out.writeUTF(msg);
-        System.out.println("--> M " + from + " " + to + " " + msg);
+        debugPrint("--> M " + from + " " + to + " " + msg);
         out.flush();
     }
 
@@ -95,7 +120,7 @@ public class ClientConnection implements PeerListener{
     public void start(String user) throws IOException {
         out.writeByte('S');
         out.writeUTF(user);
-        System.out.println("--> S " + user);
+        debugPrint("--> S " + user);
         out.flush();
     }
 
@@ -111,6 +136,14 @@ public class ClientConnection implements PeerListener{
         out.flush();
         if(serverSocket != null)
             serverSocket.close();
+    }
+
+    private void debugPrint(Stirng message)
+    {
+        if(debugMode)
+        {
+            System.out.println(message);
+        }
     }
 
     /**
@@ -138,17 +171,17 @@ public class ClientConnection implements PeerListener{
                             from = in.readUTF();
                             to = in.readUTF();
                             message = in.readUTF();
-                            System.out.println("<-- M " + from + " " + to + " " + message);
+                            debugPrint("<-- M " + from + " " + to + " " + message);
                             peerListener.message(from, to, message);
                             break;
                         case 'S':
                             username = in.readUTF();
-                            System.out.println("<-- S " + username);
+                            debugPrint("<-- S " + username);
                             peerListener.stop(username);
                             break;
                         case 'Q':
                             username = in.readUTF();
-                            System.out.println("<-- Q " + username );
+                            debugPrint("<-- Q " + username);
                             peerListener.stop(username);
                             break;
                         default:
