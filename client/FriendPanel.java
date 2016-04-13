@@ -34,7 +34,7 @@ public class FriendPanel extends JPanel {
     private HashMap<String,FriendButton> friends;
     Dimension buttonSize;
     FriendPanel(ChatFrame cf, Dimension dim, ArrayList<String> friends){
-        this.friends = new HashMap();
+        this.friends = new HashMap<String,FriendButton>();
         chatFrame = cf;
         setPreferredSize(dim);
         setLayout(new BorderLayout());
