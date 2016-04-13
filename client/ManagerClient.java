@@ -10,9 +10,9 @@
 
 //imports go here
 import java.io.*;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
+import java.security.*;
+import javax.net.ssl.*;
 
 /* class Description
 
@@ -28,9 +28,11 @@ class ManagerClient
 	//todo need to be able to specify this.
 	private String SERVER_HOST;
 	private int SERVER_PORT = 5432;
+	private String jksFileName = "keystore.jks";
+	private final char KEY_STORE_PS[] = "Chat1234".toCharArray();
 	private ServerConnection serverConnection;
 	private ClientConnection clientConnection;
-	Socket  socket;
+	SSLSocket  socket;
 
 	public ManagerClient(ChatFrame inGUI)
 	{
@@ -66,13 +68,21 @@ class ManagerClient
 	public PeerListener createClientConnection(String ip, int port)
 	{
 		//create SSL Socket to other ip
-		//SSLSocketFactory sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
+		KeyStore keystore = KeyStore.getInstance("JKS");
+		keystore.load(new FileInputStream(jksFileName), KEY_STORE_PS);
+		TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
+		tmf.init(keystore);
+		SSLContext context = SSLContext.getInstance("TLS");
+		TrustManager[] trustManagers = tmf.getTrustManagers();
+
+		context.init(null, trustManagers, null);
+		SSLSocketFactory sf = context.getSocketFactory();
+
 		PeerListener peer = null;
 		try
 		{
-			//SSLSocket c = (SSLSocket) sf.createSocket(_ip, Integer.parseInt(_port));
-			Socket c = new Socket(ip,port);
-			peer = new ClientConnection(c, GUI);
+			SSLSocket socket = (SSLSocket) sf.createSocket(SERVER_HOST, SERVER_PORT);
+			peer = new ClientConnection(socket, GUI);
 		}catch (IOException ioe)
 		{
 			System.err.println("IOException caught. Exiting");
@@ -91,13 +101,18 @@ class ManagerClient
 	 */
 	public ServerSocket createClientServerConnection()
 	{
-		//SSLServerSocketFactory ssf = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
-		//SSLServerSocket serverSocket = null;
-		ServerSocket serverSocket = null;
+		KeyStore ks = KeyStore.getInstance("JKS");
+		ks.load(new FileInputStream(jksFileName), KEY_STORE_PS);
+		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+		kmf.init(ks, KEY_PS);
+		SSLContext sc = SSLContext.getInstance("TLS");
+		sc.init(kmf.getKeyManagers(), null, null);
+		SSLServerSocketFactory ssf = sc.getServerSocketFactory();
+
+		SSLServerSocket serverSocket = null;
 		try
 		{
-			//serverSocket = (SSLServerSocket) ssf.createServerSocket(0);
-			serverSocket = new ServerSocket(0);
+			SSLServerSocket serverSocket = (SSLServerSocket) ssf.createServerSocket(0);
 		}
 		catch(Exception e)
 		{
@@ -107,7 +122,7 @@ class ManagerClient
 		return serverSocket;
 	}
 
-	public PeerListener createClientConnection(ServerSocket serverSocket, String to)
+	public PeerListener createClientConnection(SSLServerSocket serverSocket, String to)
 	{
 		try {
 			return new ClientConnection(serverSocket, GUI, to);
@@ -120,9 +135,23 @@ class ManagerClient
 	//send initial message to Server when the program start
 	public void run() throws IOException
 	{
-			socket = new Socket();
-			socket.connect(new InetSocketAddress(SERVER_HOST, SERVER_PORT));
+		try
+		{
+			KeyStore keystore = KeyStore.getInstance("JKS");
+			keystore.load(new FileInputStream(jksFileName), KEY_STORE_PS);
+			TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
+			tmf.init(keystore);
+			SSLContext context = SSLContext.getInstance("TLS");
+			TrustManager[] trustManagers = tmf.getTrustManagers();
+
+			context.init(null, trustManagers, null);
+			SSLSocketFactory sf = context.getSocketFactory();
+			socket = (SSLSocket) sf.createSocket(SERVER_HOST, SERVER_PORT);
 			serverConnection = new ServerConnection(socket, GUI);
 			GUI.setClientListener(serverConnection);
+		}catch (IOException ioe){
+			System.err.println("IOException caught while creating connection to server. Exiting");
+			System.exit(1);
+		}
 	}
 }

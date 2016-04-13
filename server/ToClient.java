@@ -11,6 +11,7 @@
 import java.io.IOException;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import javax.net.ssl.*;
 import java.net.Socket;
 
 /* class Description
@@ -22,7 +23,7 @@ import java.net.Socket;
 
 public class ToClient implements ServerListener{
 
-	private Socket sok;
+	private SSLSocket sok;
 	private ClientListener clientListener;
 	private DataOutputStream out;
 	private DataInputStream in;
@@ -35,7 +36,7 @@ public class ToClient implements ServerListener{
 	 * @param clientListener - database reference;
 	 * @throws IOException
 	 */
-	ToClient(Socket sok, ClientListener clientListener) throws IOException{
+	ToClient(SSLSocket sok, ClientListener clientListener) throws IOException{
 		debug = false;
         this.sok = sok;
 		out = new DataOutputStream (sok.getOutputStream());
@@ -53,7 +54,7 @@ public class ToClient implements ServerListener{
      * @param boolean - turn debug on
 	 * @throws IOException
 	 */
-	ToClient(Socket sok, ClientListener clientListener, boolean b) throws IOException{
+	ToClient(SSLSocket sok, ClientListener clientListener, boolean b) throws IOException{
 		debug = b;
         this.sok = sok;
 		out = new DataOutputStream (sok.getOutputStream());
@@ -66,7 +67,7 @@ public class ToClient implements ServerListener{
 	/*this method returns the ssl socket of the toclient
 	@post: sslsocket- the connection
 	*/
-	public Socket getSok(){
+	public SSLSocket getSok(){
 		return sok;
 	}//end
 
