@@ -12,7 +12,7 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.Socket;
+import javax.net.ssl.*;
 
 /* Client connection to the server.
 
@@ -22,8 +22,7 @@ import java.net.Socket;
 */
 public class ServerConnection implements ClientListener{
 
-    //private SSLSocket sok;
-    private Socket sok;
+    private SSLSocket sok;
     private ServerListener serverListener;
     private DataOutputStream out;
     private DataInputStream in;
@@ -34,7 +33,7 @@ public class ServerConnection implements ClientListener{
      * @param _serverListener - database reference.
      * @throws IOException
      */
-    public ServerConnection(Socket _sok, ServerListener _serverListener)throws IOException{
+    public ServerConnection(SSLSocket _sok, ServerListener _serverListener)throws IOException{
         sok = _sok;
         out = new DataOutputStream (sok.getOutputStream());
         in = new DataInputStream (sok.getInputStream());
