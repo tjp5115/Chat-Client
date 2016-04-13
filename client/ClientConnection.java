@@ -24,9 +24,8 @@ import java.net.Socket;
 */
 public class ClientConnection implements PeerListener{
 
-    private Socket sok;
-    //private SSLServerSocket ssok;
-    private ServerSocket serverSocket;
+    private SSLSocket sok;
+    private SSLServerSocket ssok;
     private PeerListener peerListener;
     private DataOutputStream out;
     private DataInputStream in;
@@ -37,7 +36,7 @@ public class ClientConnection implements PeerListener{
      * @param peerListener - database reference.
      * @throws IOException
      */
-    public ClientConnection(Socket sok, PeerListener peerListener) throws IOException
+    public ClientConnection(SSLSocket sok, PeerListener peerListener) throws IOException
     {
         this.sok = sok;
         out = new DataOutputStream (sok.getOutputStream());
@@ -46,7 +45,7 @@ public class ClientConnection implements PeerListener{
         new ReaderThread().start();
     }
 
-    public ClientConnection(ServerSocket serverSocket, PeerListener peerListener, String to) throws IOException{
+    public ClientConnection(SSLServerSocket serverSocket, PeerListener peerListener, String to) throws IOException{
         this.serverSocket = serverSocket;
         this.peerListener = peerListener;
         peerListener.start(to);

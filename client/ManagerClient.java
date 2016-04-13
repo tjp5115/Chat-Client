@@ -10,9 +10,9 @@
 
 //imports go here
 import java.io.*;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
+import java.security.*;
+import javax.net.ssl.*;
 
 /* class Description
 
@@ -27,9 +27,11 @@ class ManagerClient
 	private ChatFrame GUI;
 	private String SERVER_HOST;
 	private int SERVER_PORT = 5432;
+	private String jksFileName = "keystore.jks";
+	private final char KEY_STORE_PS[] = "Chat1234".toCharArray();
 	private ServerConnection serverConnection;
 	private ClientConnection clientConnection;
-	Socket  socket;
+	SSLSocket  socket;
 
 	public ManagerClient(ChatFrame inGUI)
 	{
@@ -89,13 +91,18 @@ class ManagerClient
 	 */
 	public ServerSocket createClientServerConnection()
 	{
-		//SSLServerSocketFactory ssf = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
-		//SSLServerSocket serverSocket = null;
-		ServerSocket serverSocket = null;
+		KeyStore ks = KeyStore.getInstance("JKS");
+		ks.load(new FileInputStream(jksFileName), KEY_STORE_PS);
+		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+		kmf.init(ks, KEY_PS);
+		SSLContext sc = SSLContext.getInstance("TLS");
+		sc.init(kmf.getKeyManagers(), null, null);
+		SSLServerSocketFactory ssf = sc.getServerSocketFactory();
+
+		SSLServerSocket serverSocket = null;
 		try
 		{
-			//serverSocket = (SSLServerSocket) ssf.createServerSocket(0);
-			serverSocket = new ServerSocket(0);
+			SSLServerSocket serverSocket = (SSLServerSocket) ssf.createServerSocket(0);
 		}
 		catch(Exception e)
 		{
@@ -120,8 +127,16 @@ class ManagerClient
 	{
 		try
 		{
-			socket = new Socket();
-			socket.connect(new InetSocketAddress(SERVER_HOST, SERVER_PORT));
+			KeyStore keystore = KeyStore.getInstance("JKS");
+			keystore.load(new FileInputStream(jksFileName), KEY_STORE_PS);
+			TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
+			tmf.init(keystore);
+			SSLContext context = SSLContext.getInstance("TLS");
+			TrustManager[] trustManagers = tmf.getTrustManagers();
+
+			context.init(null, trustManagers, null);
+			SSLSocketFactory sf = context.getSocketFactory();
+			socket = (SSLSocket) sf.createSocket(SERVER_HOST, SERVER_PORT);
 			serverConnection = new ServerConnection(socket, GUI);
 			GUI.setClientListener(serverConnection);
 		}catch (IOException ioe){
