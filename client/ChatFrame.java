@@ -21,6 +21,7 @@ import java.net.ServerSocket;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import javax.net.ssl.*;
 
 /* Chat frame for the GUI. Components are added to this class for each section of the frame.
 
@@ -345,7 +346,7 @@ public class ChatFrame implements ServerListener, PeerListener
         // we have the IP, now it is time to initialize the connection.
         dbHandler.addFriendIP(user, IP);
         if(dbHandler.getFriendPort(user) == null ) {
-            ServerSocket serverSocket = managerClient.createClientServerConnection();
+            SSLServerSocket serverSocket = managerClient.createClientServerConnection();
             clientListener.initConversation(dbHandler.getName(), dbHandler.getHash(), user, serverSocket.getLocalPort() + "");
             peerListener.put(user, managerClient.createClientConnection(serverSocket,user));
         }else{

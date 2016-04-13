@@ -50,7 +50,7 @@ public class ClientConnection implements PeerListener{
     public ClientConnection(SSLServerSocket serverSocket, PeerListener peerListener, String to) throws IOException{
         this.peerListener = peerListener;
         this.serverSocket = serverSocket;
-        sok = serverSocket.accept();
+        sok = (SSLSocket)serverSocket.accept();
         serverSocket.close();
         peerListener.start(to);
         debugMode = false;
@@ -72,7 +72,7 @@ public class ClientConnection implements PeerListener{
     public ClientConnection(SSLServerSocket serverSocket, PeerListener peerListener, String to, boolean debug) throws IOException{
         this.peerListener = peerListener;
         this.serverSocket = serverSocket;
-        sok = serverSocket.accept();
+        sok = (SSLSocket) serverSocket.accept();
         serverSocket.close();
         peerListener.start(to);
         debugMode = debug;
@@ -143,7 +143,7 @@ public class ClientConnection implements PeerListener{
 
     }
 
-    private void debugPrint(Stirng message)
+    private void debugPrint(String message)
     {
         if(debugMode)
         {

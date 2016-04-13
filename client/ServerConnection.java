@@ -206,7 +206,7 @@ public class ServerConnection implements ClientListener{
         out.flush();
     }
 
-    public void debugPrint(Stirng message)
+    public void debugPrint(String message)
     {
         if(debugMode)
         {
