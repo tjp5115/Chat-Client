@@ -54,7 +54,7 @@ class ManagerClient
 
 	public String getUserIP()
 	{
-		byte []addr = socket.getInetAddress().getAddress();
+		byte []addr = InetAddress.getLocalHost().getHostAddress();
 		StringBuffer out = new StringBuffer();
 		for(int i = 0; i < addr.length; ++i)
 		out.append(addr[i]+".");
