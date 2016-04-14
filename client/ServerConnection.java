@@ -52,6 +52,10 @@ public class ServerConnection implements ClientListener{
         new ReaderThread().start();
     }
 
+    public void end() throws IOException{
+        sok.close();
+    }
+
     /**
      * friend request between two users
      *

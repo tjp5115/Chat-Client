@@ -94,7 +94,12 @@ public class DatabaseHandlerServer implements ClientListener{
 		cons.put(ip,c);
 	}//end add
 
+    /*do nothing
 
+    */
+    public void end()throws IOException{
+
+    }//end 
 
 	/**
      * friend request between two users
