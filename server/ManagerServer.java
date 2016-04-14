@@ -30,17 +30,21 @@ class ManagerServer
 	private final char KEY_PS[] = "Chat5678".toCharArray();
 	private int port;
     private boolean debug;
+    private String ip;
 
-	public ManagerServer(int port)
+	public ManagerServer(String ip, int port)
 	{
 		this.port = port;
         SERVER_PORT = new Integer(port).toString();
         debug = false;
+        this.ip = ip;
     }
 
-    public ManagerServer(int port, boolean b){
-        this.port = port;
+    public ManagerServer(String ip, int port, boolean b){
+		this.port = port;
+        SERVER_PORT = new Integer(port).toString();
         debug = b;
+        this.ip = ip;    
     }
 
 	public void setDatabaseHandler(DatabaseHandlerServer dh)
@@ -62,7 +66,8 @@ class ManagerServer
 			SSLContext sc = SSLContext.getInstance("TLS");
 			sc.init(kmf.getKeyManagers(), null, null);
 			SSLServerSocketFactory ssf = sc.getServerSocketFactory();
-			SSLServerSocket serverSocket = (SSLServerSocket) ssf.createServerSocket(port);
+            InetAddress s = InetAddress.getByName(ip);
+			SSLServerSocket serverSocket = (SSLServerSocket) ssf.createServerSocket(port, 20, s);
 			System.out.println(serverSocket.getInetAddress().toString());
 
 			for(;;)

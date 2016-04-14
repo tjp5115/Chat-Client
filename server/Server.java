@@ -25,15 +25,15 @@ class Server
 		//create database handler and manager
 		DatabaseHandlerServer db = new DatabaseHandlerServer();
         ManagerServer manager = null;
-        if(args.length == 0){
-		    manager = new ManagerServer(PORT,false);
+        if(args.length == 1){
+		    manager = new ManagerServer(args[0],PORT,false);
         }//end if 
         else if(args.length == 1){
             if(args[0].equals("true")){
-                manager = new ManagerServer(PORT,true);   
+                manager = new ManagerServer(args[0],PORT,true);   
             }
             else if(args[0].equals("false")){
-                manager = new ManagerServer(PORT,false);
+                manager = new ManagerServer(args[0],PORT,false);
             }
             else{
                 usage();
@@ -48,7 +48,7 @@ class Server
 
 	private static void usage()
 	{
-		System.err.println("Usage: java Server [<debug(true/false)>]");
+		System.err.println("Usage: java Server <Host ip> [<debug(true/false)>]");
 		throw new IllegalArgumentException();
 	}
 }
