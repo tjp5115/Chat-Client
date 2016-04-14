@@ -29,7 +29,7 @@ public class ClientConnection implements PeerListener{
     private PeerListener peerListener;
     private DataOutputStream out;
     private DataInputStream in;
-    private boolean debugMode;
+    private boolean debugMode = true;
 
     /**
      * constructor for the server connection
@@ -43,7 +43,6 @@ public class ClientConnection implements PeerListener{
         out = new DataOutputStream (sok.getOutputStream());
         in = new DataInputStream (sok.getInputStream());
         this.peerListener = peerListener;
-        debugMode = false;
         new ReaderThread().start();
     }
 
@@ -53,7 +52,6 @@ public class ClientConnection implements PeerListener{
         sok = (SSLSocket)serverSocket.accept();
         serverSocket.close();
         peerListener.start(to);
-        debugMode = false;
         out = new DataOutputStream(sok.getOutputStream());
         in = new DataInputStream(sok.getInputStream());
         new ReaderThread().start();

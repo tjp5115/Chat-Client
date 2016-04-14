@@ -28,11 +28,11 @@ class Server
         if(args.length == 1){
 		    manager = new ManagerServer(args[0],PORT,false);
         }//end if 
-        else if(args.length == 1){
-            if(args[0].equals("true")){
+        else if(args.length == 2){
+            if(args[1].equals("true")){
                 manager = new ManagerServer(args[0],PORT,true);   
             }
-            else if(args[0].equals("false")){
+            else if(args[1].equals("false")){
                 manager = new ManagerServer(args[0],PORT,false);
             }
             else{

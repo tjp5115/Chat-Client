@@ -81,7 +81,7 @@ class ManagerClient
 		context.init(null, trustManagers, null);
 		SSLSocketFactory sf = context.getSocketFactory();
 
-		SSLSocket socket = (SSLSocket) sf.createSocket(SERVER_HOST, SERVER_PORT);
+		SSLSocket socket = (SSLSocket) sf.createSocket(ip, port);
 		peer = new ClientConnection(socket, GUI);
 		}
         catch (IOException ioe)

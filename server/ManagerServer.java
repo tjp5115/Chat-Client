@@ -79,6 +79,7 @@ class ManagerServer
 				new ToClient(clientSocket, dbHandler, debug);
 			}
 		} catch (IOException e) {
+			e.printStackTrace();
 			System.err.println("IOException in Server manager");
 		}
         catch(Exception e){
