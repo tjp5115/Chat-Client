@@ -75,6 +75,14 @@ public class DatabaseHandlerServer implements ClientListener{
 		}//end catch
 	}//end init
 
+
+    /*
+        DO NOTHING
+    */
+    public String IP(){
+        return null;
+    }
+
 	/*this method adds a connection
 		@parm: String username
 		@parm: String hash

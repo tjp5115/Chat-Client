@@ -13,6 +13,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import javax.net.ssl.*;
+import java.net.*;
 
 /* Client connection to the server.
 
@@ -121,6 +122,24 @@ public class ServerConnection implements ClientListener{
         debugPrint("--> J " + user + " " + user_hash);
         out.flush();
     }
+
+	/*gets client ip
+
+	*/
+	public String IP(){
+		 String addr = null;
+		 try {
+		 addr = sok.getLocalAddress().getLocalHost().getHostAddress();
+         }
+		 catch (UnknownHostException e) {
+		 e.printStackTrace();
+		 }
+	    System.out.println(addr + "B");
+        System.out.println(sok);
+		 return addr;
+
+	    }
+
 
     /**
      * log off trigger

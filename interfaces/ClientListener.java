@@ -42,6 +42,11 @@ public interface ClientListener {
     */
     public void end() throws IOException;
 
+    /*gets ip of this socket
+
+    */
+    public String IP();
+
 
 	/*this method adds a connection
 		@parm: String username

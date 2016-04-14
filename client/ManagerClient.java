@@ -1,11 +1,11 @@
-/* 
- * filename.java 
- * 
- * Version: 
- * 	$Id$ 
- * 
- * Revisions: 
- * 	$Log$ 
+/*
+ * filename.java
+ *
+ * Version:
+ * 	$Id$
+ *
+ * Revisions:
+ * 	$Log$
  */
 
 //imports go here
@@ -13,6 +13,9 @@ import java.io.*;
 import java.net.*;
 import java.security.*;
 import javax.net.ssl.*;
+import java.util.Enumeration;
+
+
 
 /* class Description
 
@@ -54,12 +57,20 @@ class ManagerClient
 
 	public String getUserIP() {
  		String addr = null;
- 		try {
- 		addr = socket.getInetAddress().getLocalHost().getHostAddress();
- 		} catch (UnknownHostException e) {
- 		e.printStackTrace();
- 		}
- 		System.out.println(addr);
+        try{
+        NetworkInterface ni = NetworkInterface.getByName("eth0");
+        Enumeration<InetAddress> net = ni.getInetAddresses();
+        while(net.hasMoreElements()){
+            InetAddress i = net.nextElement();
+            if(!i.isLinkLocalAddress()){
+                addr = i.getHostAddress();
+            }
+        }
+        }
+        catch(Exception e){
+               
+        }
+ 		System.out.println(addr + "!!!");
  		return addr;
  	}
 
@@ -71,7 +82,7 @@ class ManagerClient
 	public PeerListener createClientConnection(String ip, int port)
 	{
     PeerListener peer = null;
-	try{	
+	try{
         //create SSL Socket to other ip
 		KeyStore keystore = KeyStore.getInstance("JKS");
 		keystore.load(new FileInputStream(jksFileName), KEY_STORE_PS);
@@ -82,7 +93,6 @@ class ManagerClient
 
 		context.init(null, trustManagers, null);
 		SSLSocketFactory sf = context.getSocketFactory();
-
 		SSLSocket socket = (SSLSocket) sf.createSocket(ip, port);
 		peer = new ClientConnection(socket, GUI);
 		}
