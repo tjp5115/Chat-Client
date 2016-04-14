@@ -29,7 +29,7 @@ public class ClientConnection implements PeerListener{
     private PeerListener peerListener;
     private DataOutputStream out;
     private DataInputStream in;
-    private boolean debugMode = true;
+    private boolean debugMode = false;
 
     /**
      * constructor for the server connection

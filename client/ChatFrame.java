@@ -264,6 +264,7 @@ public class ChatFrame implements ServerListener, PeerListener
     @Override
     public void start(String user) throws IOException {
         createChatSession(user);
+        System.out.println("should work?");
     }
 
     /**
@@ -353,7 +354,7 @@ public class ChatFrame implements ServerListener, PeerListener
             peerListener.put(user,
                     managerClient.createClientConnection(dbHandler.getFriendIP(user),
                             Integer.parseInt(dbHandler.getFriendPort(user))));
-            start(user);
+           start(user);
         }
     }
 
