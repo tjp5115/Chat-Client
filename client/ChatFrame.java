@@ -412,7 +412,7 @@ public class ChatFrame implements ServerListener, PeerListener
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
-            dbHandler.init(user, getIP());
+            dbHandler.init(user, registerPanel.getServerIP());
             loginSuccess();
         } else
             JOptionPane.showMessageDialog(null, "Username is taken, select a new one.",

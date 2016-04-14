@@ -47,10 +47,10 @@ public class DatabaseHandlerClient {
             //creates the connection
             if ( !new File(path).exists() ) throw new SQLException();
             if(path.endsWith("/")) {
-                conn = DriverManager.getConnection("jdbc:h2:" + path + user + ";CIPHER=AES", user, "filepwd " + password);
+                conn = DriverManager.getConnection("jdbc:h2:" + path + user + ";CIPHER=AES", user, "filepwd " + password+ ";TRACE_LEVEL_FILE=OFF");
             }else{
                 path = path.substring(0,path.length()-6);
-                conn = DriverManager.getConnection("jdbc:h2:file:" + path + ";CIPHER=AES;IFEXISTS=TRUE;", user,  "filepwd " + password);
+                conn = DriverManager.getConnection("jdbc:h2:file:" + path + ";CIPHER=AES;IFEXISTS=TRUE;", user,  "filepwd " + password+ ";TRACE_LEVEL_FILE=OFF");
                 /*
                 new Thread(new Runnable() {
                     @Override

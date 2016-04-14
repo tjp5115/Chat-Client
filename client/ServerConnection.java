@@ -93,7 +93,7 @@ public class ServerConnection implements ClientListener{
      */
     @Override
     public void createAccount(String ip, String username, String username_hash) throws IOException {
-        System.out.println(sok);
+        debugPrint(sok.toString());
         out.writeByte('R');
         out.writeUTF(ip);
         out.writeUTF(username);

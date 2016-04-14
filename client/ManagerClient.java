@@ -129,6 +129,7 @@ class ManagerClient
 			return new ClientConnection(serverSocket, GUI, to);
 		} catch (IOException e) {
 			System.err.println("IOException while creating a clientConnection in the manager.");
+            e.printStackTrace();
 		}
 		return null;
 	}
@@ -152,6 +153,7 @@ class ManagerClient
 			GUI.setClientListener(serverConnection);
 		}catch (IOException ioe){
 			System.err.println("IOException caught while creating connection to server. Exiting");
+            ioe.printStackTrace();
 			System.exit(1);
 		}
         catch(Exception e){
