@@ -52,14 +52,16 @@ class ManagerClient
 		return SERVER_HOST;
 	}
 
-	public String getUserIP()
-	{
-		byte []addr = InetAddress.getLocalHost().getHostAddress();
-		StringBuffer out = new StringBuffer();
-		for(int i = 0; i < addr.length; ++i)
-		out.append(addr[i]+".");
-		return out.substring(0,out.length()-1);
-	}
+	public String getUserIP() {
+ 		String addr = null;
+ 		try {
+ 		addr = Inet4Address.getLocalHost().getHostAddress().toString();
+ 		} catch (UnknownHostException e) {
+ 		e.printStackTrace();
+ 		}
+ 		System.out.println(addr);
+ 		return addr;
+ 	}
 
 	/**
 	 * set up the peer connection between two clients. Assumes the establishment process has been completed.
