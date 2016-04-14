@@ -13,6 +13,7 @@ import java.io.*;
 import java.net.*;
 import java.security.*;
 import javax.net.ssl.*;
+import java.security.cert.CertificateException;
 import java.util.Enumeration;
 
 
@@ -70,7 +71,13 @@ class ManagerClient
         catch(Exception e){
                
         }
- 		System.out.println(addr + "!!!");
+		if(addr == null){
+			try {
+				addr = Inet4Address.getLocalHost().getHostAddress();
+			} catch (UnknownHostException e) {
+				e.printStackTrace();
+			}
+		}
  		return addr;
  	}
 
@@ -147,29 +154,29 @@ class ManagerClient
 	}
 
 	//send initial message to Server when the program start
-	public void run() throws IOException
-	{
-		try
-		{
+	public void run() throws IOException{
+		try {
 			KeyStore keystore = KeyStore.getInstance("JKS");
 			keystore.load(new FileInputStream(jksFileName), KEY_STORE_PS);
 			TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
 			tmf.init(keystore);
 			SSLContext context = SSLContext.getInstance("TLS");
 			TrustManager[] trustManagers = tmf.getTrustManagers();
-
 			context.init(null, trustManagers, null);
 			SSLSocketFactory sf = context.getSocketFactory();
 			socket = (SSLSocket) sf.createSocket(SERVER_HOST, SERVER_PORT);
 			serverConnection = new ServerConnection(socket, GUI);
 			GUI.setClientListener(serverConnection);
-		}catch (IOException ioe){
-			System.err.println("IOException caught while creating connection to server. Exiting");
-            ioe.printStackTrace();
-			System.exit(1);
+		} catch (KeyStoreException e) {
+			e.printStackTrace();
+		}catch(CertificateException e){
+			e.printStackTrace();
+		}catch(NoSuchAlgorithmException e){
+			e.printStackTrace();
+		} catch (KeyManagementException e) {
+			e.printStackTrace();
 		}
-        catch(Exception e){
-            System.err.println("SSL error?");
-        }
+
+
 	}
 }
