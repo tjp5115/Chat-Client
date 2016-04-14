@@ -55,7 +55,7 @@ class ManagerClient
 	public String getUserIP() {
  		String addr = null;
  		try {
- 		addr = Inet4Address.getLocalHost().getHostAddress().toString();
+ 		addr = socket.getInetAddress().getLocalHost().getHostAddress();
  		} catch (UnknownHostException e) {
  		e.printStackTrace();
  		}
