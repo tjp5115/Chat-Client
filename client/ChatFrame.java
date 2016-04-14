@@ -264,7 +264,7 @@ public class ChatFrame implements ServerListener, PeerListener
     @Override
     public void start(String user) throws IOException {
         createChatSession(user);
-        System.out.println("should work?");
+        //System.out.println("should work?");
     }
 
     /**
