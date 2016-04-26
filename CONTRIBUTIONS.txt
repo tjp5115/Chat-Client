@@ -1,0 +1,25 @@
+Lai Chung Lau
+-------------
+    Coded Managers
+    Coded mains
+    researched and implimented SSL
+    Designed Poster
+
+
+Samuel Launt
+------------
+    Coded databases/databaseHandlers
+    Lead program designer
+    Created spec document
+    Created reports
+    Debug
+
+
+Tyler Paulson
+-------------
+    Coded GUI
+    Coded interfaces
+    Coded threads
+    Debug
+
+     
