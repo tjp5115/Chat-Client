@@ -13,8 +13,8 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
+import javax.net.ssl.*;
 
 /* Client connection between two peers. Used for chat communication.
 
@@ -24,11 +24,12 @@ import java.net.Socket;
 */
 public class ClientConnection implements PeerListener{
 
-    private Socket sok;
-    private ServerSocket serverSocket;
+    private SSLSocket sok;
+    private SSLServerSocket serverSocket;
     private PeerListener peerListener;
     private DataOutputStream out;
     private DataInputStream in;
+    private boolean debugMode = false;
 
     /**
      * constructor for the server connection
@@ -36,7 +37,7 @@ public class ClientConnection implements PeerListener{
      * @param peerListener - database reference.
      * @throws IOException
      */
-    public ClientConnection(Socket sok, PeerListener peerListener) throws IOException
+    public ClientConnection(SSLSocket sok, PeerListener peerListener) throws IOException
     {
         this.sok = sok;
         out = new DataOutputStream (sok.getOutputStream());
@@ -45,12 +46,34 @@ public class ClientConnection implements PeerListener{
         new ReaderThread().start();
     }
 
-    public ClientConnection(ServerSocket serverSocket, PeerListener peerListener, String to) throws IOException{
+    public ClientConnection(SSLServerSocket serverSocket, PeerListener peerListener, String to) throws IOException{
         this.peerListener = peerListener;
         this.serverSocket = serverSocket;
-        sok = serverSocket.accept();
+        sok = (SSLSocket)serverSocket.accept();
         serverSocket.close();
         peerListener.start(to);
+        out = new DataOutputStream(sok.getOutputStream());
+        in = new DataInputStream(sok.getInputStream());
+        new ReaderThread().start();
+    }
+
+    public ClientConnection(SSLSocket sok, PeerListener peerListener, boolean debug) throws IOException
+    {
+        this.sok = sok;
+        out = new DataOutputStream (sok.getOutputStream());
+        in = new DataInputStream (sok.getInputStream());
+        this.peerListener = peerListener;
+        debugMode = debug;
+        new ReaderThread().start();
+    }
+
+    public ClientConnection(SSLServerSocket serverSocket, PeerListener peerListener, String to, boolean debug) throws IOException{
+        this.peerListener = peerListener;
+        this.serverSocket = serverSocket;
+        sok = (SSLSocket) serverSocket.accept();
+        serverSocket.close();
+        peerListener.start(to);
+        debugMode = debug;
         out = new DataOutputStream(sok.getOutputStream());
         in = new DataInputStream(sok.getInputStream());
         new ReaderThread().start();
@@ -82,7 +105,7 @@ public class ClientConnection implements PeerListener{
         out.writeUTF(from);
         out.writeUTF(to);
         out.writeUTF(msg);
-        System.out.println("--> M " + from + " " + to + " " + msg);
+        debugPrint("--> M " + from + " " + to + " " + msg);
         out.flush();
     }
 
@@ -95,7 +118,7 @@ public class ClientConnection implements PeerListener{
     public void start(String user) throws IOException {
         out.writeByte('S');
         out.writeUTF(user);
-        System.out.println("--> S " + user);
+        debugPrint("--> S " + user);
         out.flush();
     }
 
@@ -109,8 +132,21 @@ public class ClientConnection implements PeerListener{
         out.writeByte('Q');
         out.writeUTF(user);
         out.flush();
-        if(serverSocket != null)
+        if(serverSocket != null){
             serverSocket.close();
+        }
+        if(sok != null){
+            sok.close();
+        }
+
+    }
+
+    private void debugPrint(String message)
+    {
+        if(debugMode)
+        {
+            System.out.println(message);
+        }
     }
 
     /**
@@ -138,17 +174,17 @@ public class ClientConnection implements PeerListener{
                             from = in.readUTF();
                             to = in.readUTF();
                             message = in.readUTF();
-                            System.out.println("<-- M " + from + " " + to + " " + message);
+                            debugPrint("<-- M " + from + " " + to + " " + message);
                             peerListener.message(from, to, message);
                             break;
                         case 'S':
                             username = in.readUTF();
-                            System.out.println("<-- S " + username);
+                            debugPrint("<-- S " + username);
                             peerListener.stop(username);
                             break;
                         case 'Q':
                             username = in.readUTF();
-                            System.out.println("<-- Q " + username );
+                            debugPrint("<-- Q " + username);
                             peerListener.stop(username);
                             break;
                         default:

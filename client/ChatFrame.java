@@ -21,6 +21,7 @@ import java.net.ServerSocket;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import javax.net.ssl.*;
 
 /* Chat frame for the GUI. Components are added to this class for each section of the frame.
 
@@ -263,6 +264,7 @@ public class ChatFrame implements ServerListener, PeerListener
     @Override
     public void start(String user) throws IOException {
         createChatSession(user);
+        //System.out.println("should work?");
     }
 
     /**
@@ -345,14 +347,14 @@ public class ChatFrame implements ServerListener, PeerListener
         // we have the IP, now it is time to initialize the connection.
         dbHandler.addFriendIP(user, IP);
         if(dbHandler.getFriendPort(user) == null ) {
-            ServerSocket serverSocket = managerClient.createClientServerConnection();
+            SSLServerSocket serverSocket = managerClient.createClientServerConnection();
             clientListener.initConversation(dbHandler.getName(), dbHandler.getHash(), user, serverSocket.getLocalPort() + "");
             peerListener.put(user, managerClient.createClientConnection(serverSocket,user));
         }else{
             peerListener.put(user,
                     managerClient.createClientConnection(dbHandler.getFriendIP(user),
                             Integer.parseInt(dbHandler.getFriendPort(user))));
-            start(user);
+           start(user);
         }
     }
 
@@ -411,12 +413,14 @@ public class ChatFrame implements ServerListener, PeerListener
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
-            dbHandler.init(user, getIP());
+            dbHandler.init(user, registerPanel.getServerIP());
             loginSuccess();
-        } else
+        } else{
             JOptionPane.showMessageDialog(null, "Username is taken, select a new one.",
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
+            clientListener.end();
+            }//end else
     }
 
     /**

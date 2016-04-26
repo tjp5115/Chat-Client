@@ -64,7 +64,6 @@ hit the add friend button at the bottom and enter their name.
 Now that we have friends (assuming that they accepted) click there name to require a conversation
 to be started. (assuming they said yes) Click in the text box and text your message and click send.
 
-
 Restristions
 ------------
 

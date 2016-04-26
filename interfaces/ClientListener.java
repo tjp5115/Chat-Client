@@ -37,6 +37,17 @@ public interface ClientListener {
     public void friendRequest( String from, String from_hash, String to, int status) throws IOException;
 
 
+    /*closes the socket
+
+    */
+    public void end() throws IOException;
+
+    /*gets ip of this socket
+
+    */
+    public String IP();
+
+
 	/*this method adds a connection
 		@parm: String username
 		@parm: String hash

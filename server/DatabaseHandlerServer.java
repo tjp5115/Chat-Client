@@ -75,6 +75,14 @@ public class DatabaseHandlerServer implements ClientListener{
 		}//end catch
 	}//end init
 
+
+    /*
+        DO NOTHING
+    */
+    public String IP(){
+        return null;
+    }
+
 	/*this method adds a connection
 		@parm: String username
 		@parm: String hash
@@ -94,7 +102,12 @@ public class DatabaseHandlerServer implements ClientListener{
 		cons.put(ip,c);
 	}//end add
 
+    /*do nothing
 
+    */
+    public void end()throws IOException{
+
+    }//end 
 
 	/**
      * friend request between two users

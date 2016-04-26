@@ -11,6 +11,7 @@
 import java.io.IOException;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import javax.net.ssl.*;
 import java.net.Socket;
 
 /* class Description
@@ -22,11 +23,12 @@ import java.net.Socket;
 
 public class ToClient implements ServerListener{
 
-	private Socket sok;
+	private SSLSocket sok;
 	private ClientListener clientListener;
 	private DataOutputStream out;
 	private DataInputStream in;
 	private ToClient toc;
+    private boolean debug;
 
 	/**
 	 *  Constructor for the ToClient connection
@@ -34,8 +36,27 @@ public class ToClient implements ServerListener{
 	 * @param clientListener - database reference;
 	 * @throws IOException
 	 */
-	ToClient(Socket sok, ClientListener clientListener) throws IOException{
-		this.sok = sok;
+	ToClient(SSLSocket sok, ClientListener clientListener) throws IOException{
+		debug = false;
+        this.sok = sok;
+		out = new DataOutputStream (sok.getOutputStream());
+		in = new DataInputStream (sok.getInputStream());
+		this.clientListener = clientListener;
+		toc = this;
+		new ReaderThread().start();
+	}
+
+
+	/**
+	 *  Constructor for the ToClient connection
+	 * @param sok - SSL socket
+	 * @param clientListener - database reference;
+     * @param boolean - turn debug on
+	 * @throws IOException
+	 */
+	ToClient(SSLSocket sok, ClientListener clientListener, boolean b) throws IOException{
+		debug = b;
+        this.sok = sok;
 		out = new DataOutputStream (sok.getOutputStream());
 		in = new DataInputStream (sok.getInputStream());
 		this.clientListener = clientListener;
@@ -46,7 +67,7 @@ public class ToClient implements ServerListener{
 	/*this method returns the ssl socket of the toclient
 	@post: sslsocket- the connection
 	*/
-	public Socket getSok(){
+	public SSLSocket getSok(){
 		return sok;
 	}//end
 
@@ -85,7 +106,7 @@ public class ToClient implements ServerListener{
 		out.writeUTF(from);
 		out.writeUTF(to);
 		out.writeByte(status);
-		System.out.println("--> F " + from + " " + to + " " + status);
+		print("--> F " + from + " " + to + " " + status);
 		out.flush();
 	}//end user
 
@@ -110,7 +131,7 @@ public class ToClient implements ServerListener{
 		out.writeByte ('G');
 		out.writeUTF(user);
 		out.writeUTF(IP);
-		System.out.println("--> G " + user + " " + IP);
+	    print("--> G " + user + " " + IP);
 		out.flush();
 	}//end ip
 
@@ -122,7 +143,7 @@ public class ToClient implements ServerListener{
     public void error(String error) throws IOException{
 		out.writeByte('E');
 		out.writeUTF(error);
-		System.out.println("--> E " + error);
+		print("--> E " + error);
 		out.flush();
 	}//end error
 
@@ -132,7 +153,7 @@ public class ToClient implements ServerListener{
      */
     public void loginSuccess() throws IOException {
 		out.writeByte('R');
-		System.out.println("--> R " );
+	    print("--> R " );
 		out.flush();
 	}//end
 
@@ -147,7 +168,7 @@ public class ToClient implements ServerListener{
 		out.writeByte ('M');
 		out.writeUTF(requester);
 		out.writeUTF(friend);
-		System.out.println("--> M " + requester + " " + friend );
+		print("--> M " + requester + " " + friend );
 		out.flush();
 	}
 
@@ -162,7 +183,7 @@ public class ToClient implements ServerListener{
 		out.writeUTF(from);
 		out.writeUTF(to);
 		out.writeUTF(port);
-		System.out.println("--> S " + from + " " + to + " " + port);
+		print("--> S " + from + " " + to + " " + port);
 		out.flush();
 	}
 
@@ -175,7 +196,7 @@ public class ToClient implements ServerListener{
 		out.writeByte ('C');
 		out.writeUTF(user);
 		out.writeByte(status);
-		System.out.println("--> C " + user + " " + status );
+		print("--> C " + user + " " + status );
 		out.flush();
 	}//end
 
@@ -186,9 +207,18 @@ public class ToClient implements ServerListener{
     public void rejectedConverstation(String user) throws IOException{
 		out.writeByte('Z');
 		out.writeUTF(user);
-		System.out.println("--> Z " + user + " " );
+		print("--> Z " + user + " " );
 		out.flush();
 	}
+
+    /*prints if debug is true
+
+    */
+    private void print(String s){
+        if(debug){
+            System.out.println(s);
+        }
+    }
 
 	/**
 	 * Class ReaderThread receives messages from the network, decodes them, and
@@ -217,28 +247,28 @@ public class ToClient implements ServerListener{
 							hash = in.readUTF();
 							to = in.readUTF();
 							status = in.readByte();
-							System.out.println("<-- F " + from+ " " + hash+ " " + to + " " + status);
+							print("<-- F " + from+ " " + hash+ " " + to + " " + status);
 							clientListener.friendRequest(from,hash,to,status);
 							break;
 						case 'R':
 							ip = in.readUTF();
 							username = in.readUTF();
 							hash = in.readUTF();
-							System.out.println("<-- R " + ip + " " + username + " " + hash );
+							print("<-- R " + ip + " " + username + " " + hash );
 							clientListener.add(ip, toc);
 							clientListener.createAccount(ip, username, hash);
 							break;
 						case 'J':
 							username = in.readUTF();
 							hash = in.readUTF();
-							System.out.println("<-- J " + username + " " + hash );
+							print("<-- J " + username + " " + hash );
 							clientListener.add(username, hash, toc);
 							clientListener.logon(username, hash);
 							break;
 						case 'Q':
 							username = in.readUTF();
 							hash = in.readUTF();
-							System.out.println("<-- Q " + username + " " + hash );
+							print("<-- Q " + username + " " + hash );
 							clientListener.logoff(username, hash);
 							break;
 						case 'S':
@@ -246,28 +276,28 @@ public class ToClient implements ServerListener{
 							hash = in.readUTF();
 							to = in.readUTF();
 							String port = in.readUTF();
-							System.out.println("<-- S " + from+ " " + hash+ " " + to + " " + port);
+							print("<-- S " + from+ " " + hash+ " " + to + " " + port);
 							clientListener.initConversation(from, hash, to, port);
 							break;
 						case 'G':
 							from = in.readUTF();
 							hash = in.readUTF();
 							to = in.readUTF();
-							System.out.println("<-- G " + from+ " " + hash+ " " + to);
+							print("<-- G " + from+ " " + hash+ " " + to);
 							clientListener.getIP(from, hash, to);
 							break;
 						case 'Z':
 							from = in.readUTF();
 							hash = in.readUTF();
 							to = in.readUTF();
-							System.out.println("<-- Z " + from+ " " + hash+ " " + to);
+							print("<-- Z " + from+ " " + hash+ " " + to);
 							clientListener.rejectConversation(from, hash, to);
 							break;
 						case 'M':
 							from = in.readUTF();
 							hash = in.readUTF();
 							to = in.readUTF();
-							System.out.println("<-- M " + from+ " " + hash+ " " + to);
+							print("<-- M " + from+ " " + hash+ " " + to);
 							clientListener.requestRemoveFriend(from, hash, to);
 							break;
 						default:
